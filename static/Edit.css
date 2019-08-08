@@ -1,0 +1,359 @@
+.Ed-button {
+  border-style: solid;
+  border-width: 1px;
+  border-color: gray;
+  display: inline-block;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.Ed-button:hover {
+  background-color: gray;
+  color: white;
+}
+
+.Ed-button.disabled {
+  background-color: transparent;
+  color: gray;
+  cursor: default;
+}
+
+.Ed-react-select-container {
+  display: inline-block;
+  font-size: 14px;
+  width: 200px;
+}
+
+.Ed-react-select__control {
+  min-height: 24px !important; 
+  height: 24px;
+  border-radius: 0px !important;
+}
+
+.Ed-child-collection-container {
+  display: inline-block;
+  margin: -4px;
+}
+
+.Ed-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.Ed-column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+}
+
+.Ed-field-group {
+  padding: 2px;
+}
+
+.Ed-field-name {
+  display: inline-block;
+  width: 200px;
+  vertical-align: top;
+}
+
+.Ed-column-button {
+  flex: none;
+  width: 70px;
+}
+
+.Ed-page-nav-container {
+  padding-bottom: 4px;
+  margin: -4px -4px 4px -4px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  background-color: lightgray;
+  padding: 4px;
+}
+
+.Ed-page-nav-container div {
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.Ed-selected-item {
+  background-color:  rgba(0,0,0,0.1);
+}
+
+.Ed-single-col-wrapper {
+  margin: 4px;
+  padding: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: gray;  
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.Ed-single-col-wrapper th {
+  font-weight: normal;
+  text-align: left;
+  padding-left: 4px;
+}
+
+.Ed-two-col-wrapper {
+  display: flex;
+  font-size: 14px;
+}
+
+.Ed-single-col-wrapper input[type="text"] {
+  width: 200px;
+}
+
+.Ed-two-col-wrapper input[type="url"] {
+  width: 200px;
+}
+
+.Ed-two-col-wrapper input[type="text"] {
+  width: 200px;
+}
+
+.Ed-two-col-wrapper input[type="url"] {
+  width: 200px;
+}
+
+.Ed-two-col-wrapper textarea {
+  width: 400px;
+  height: 70px;
+}
+
+.Ed-left-col {
+  flex: 30%;
+  margin: 4px;
+  padding: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: gray;
+  border-radius: 4px;
+}
+
+.Ed-right-col {
+  flex: 70%;
+  margin: 4px;
+  padding: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: gray;  
+  border-radius: 4px;
+}
+
+.Ed-field-info {
+  display: inline-block;
+  vertical-align: super;
+  font-size: 10px;
+  margin-left: 2px;
+}
+
+.Ed-field-info::after {
+  content: 'i';
+}
+
+.Ed-menu {
+  background-color: lightgray;
+  padding: 4px;
+  /* width: 300px; */
+}
+
+.Ed-menu-button {
+  border-style: none;
+  background-color: lightgray;
+  font-size: 16px;
+  padding: 4px;
+}
+
+.Ed-menu-items {
+  padding: 4px;
+  font-size: 14px;
+  margin-block-start: 0px;
+}
+
+.Ed-menu .AriaMenuButton {
+  display: inline-block;
+  position: relative;
+}
+
+.Ed-menu .AriaMenuButton-trigger {
+  cursor: pointer;
+  display: inline-block;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.Ed-menu .AriaMenuButton-trigger::after {
+  content: "";
+  display: inline-block;
+  margin-left: 3px;
+  position: relative;
+  top: 3px;
+  border-color: currentColor transparent transparent;
+  border-width: 5px 4px;
+  border-style: solid;
+}
+
+.Ed-menu .AriaMenuButton-trigger:hover,
+.AriaMenuButton-trigger:focus,
+.AriaMenuButton-trigger.is-open {
+  outline: none;
+}
+
+.Ed-menu .AriaMenuButton-trigger:active,
+.AriaMenuButton-trigger.is-open {
+  outline: none;
+}
+
+.Ed-menu .AriaMenuButton-menu {
+  /* background: $emphasis-background-3;
+  color: $emphasis-text-3;
+  border-color: $emphasis-border-3; */
+  background-color: lightgray;
+  font-weight: normal;
+  list-style-type: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 99;
+  padding-left: 0;
+  margin: 0;
+  width: 315px;
+}
+
+.Ed-menu .AriaMenuButton-menu--flushRight {
+  right: 0;
+}
+
+.Ed-menu .current.AriaMenuButton-menuItem {
+  font-weight: bold;
+}
+
+.Ed-menu .AriaMenuButton-menuItem {
+  cursor: pointer;
+  padding: 0px;
+}
+
+.Ed-menu .AriaMenuButton-menuItem div {
+  padding: 4px;
+  width: 100%;
+}
+
+
+.Ed-menu a {
+  text-decoration: none;
+  color: black;
+}
+
+.Ed-menu a:hover {
+  color: white;
+}
+
+.Ed-menu .AriaMenuButton-menuItem:hover,
+.AriaMenuButton-menuItem:focus {
+  background-color: gray;
+  color: white;
+}
+
+.Ed-menu .AriaMenuButton-menuItem:hover,
+.AriaMenuButton-menuItem:focus a {
+  color: white;
+}
+
+
+.Ed-menu .AriaMenuButton-menuItem.is-selected {
+  cursor: default;
+  font-weight: bold;
+}
+
+.Ed-save-cancel-block {
+  float: right;
+}
+
+.Ed-save-cancel-block .Ed-button{
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.Ed-required-field {
+  display: inline;
+  color: red;
+  margin-left: 2px;
+}
+
+.Ed-required-field::after {
+  content: '*';
+}
+
+.Ed-validation-errors {
+  color: red;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.Ed-tabular-field-error {
+  display: inline-block;
+  color: red;
+  width: 6px;
+  padding-left: 2px;
+}
+
+.Ed-tabular-field-no-error {
+  display: inline-block;
+  width: 6px;
+}
+
+.Ed-tabular-field-error::after {
+  content: '!';
+}
+
+.Ed-container-link {
+  color: black;
+  text-decoration: none;
+}
+
+.Ed-container-link:hover {
+  background-color:  rgba(0,0,0,0.1);
+}
+
+.Ed-collection-error-item {
+  color: red;
+}
+
+.Ed-shortcut-char {
+  text-decoration: underline;
+}
+
+/* Spinner */
+
+.Ed-loading {
+  display: inline-block;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+}
+.Ed-loading:after {
+  content: " ";
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 1px;
+  border-radius: 50%;
+  border: 5px solid black;
+  border-color: black transparent black transparent;
+  animation: Ed-loading 1.2s linear infinite;
+}
+@keyframes Ed-loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

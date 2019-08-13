@@ -1,6 +1,6 @@
 {
   "name": "react-auto-edit",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "clone-deep": "^4.0.1",
+    "dayjs": "^1.8.15",
     "joi-key-extensions": "^1.0.1",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",

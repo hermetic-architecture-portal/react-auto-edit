@@ -11,6 +11,7 @@ import EditFieldNumber from './EditFieldNumber';
 import EditFieldArrayOfStrings from './EditFieldArrayOfStrings';
 import EditFieldDate from './EditFieldDate';
 import constants from '../constants';
+import EditFieldImage from './EditFieldImage';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -34,8 +35,11 @@ const EditField = ({
       container={container}
       isRequired={isRequired} />;
   } else if (fieldSchemaDesc.type === 'date') {
+    const formatArg = utils.findRuleArg(fieldSchemaDesc, 'format');
+    const format = (formatArg && formatArg.format.length) ? formatArg.format[0] : 'YYYY-MM-DD';
     editField = <EditFieldDate readonly={readonly}
       fieldName={fieldName} required={isRequired}
+      format={format}
       container={container} />;
   } else if (utils.findRule(fieldSchemaDesc, 'uri')) {
     editField = <EditFieldUri readonly={readonly}
@@ -43,6 +47,10 @@ const EditField = ({
       container={container}
       maxLength={max}
       minLength={min} />;
+  } else if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.find(m => m.image)) {
+    editField = <EditFieldImage readonly={readonly}
+      fieldName={fieldName} required={isRequired}
+      container={container} />;    
   } else if (fieldSchemaDesc.type === 'string') {
     if (max && (max >= constants.bigStringSize)) {
       editField = <EditFieldBigString readonly={readonly}
@@ -83,7 +91,7 @@ const EditField = ({
       container={container} />;
   } else {
     console.error('No editor', fieldName, fieldSchemaDesc);
-    throw new Error(`No editor available for field ${fieldName}`);
+    throw new Error(`No editor available for field ${fieldName}, type ${fieldSchemaDesc.type}`);
   }
 
   return editField;

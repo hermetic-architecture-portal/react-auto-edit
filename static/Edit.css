@@ -328,6 +328,13 @@
   text-decoration: underline;
 }
 
+.Ed-image {
+  display: inline-block;
+}
+
+.Ed-image img {
+  max-width: 300px;
+}
 /* Spinner */
 
 .Ed-loading {

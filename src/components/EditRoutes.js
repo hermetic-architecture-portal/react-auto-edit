@@ -3,7 +3,6 @@ import { Route } from 'react-router-dom';
 import { configure } from 'react-hotkeys';
 import EditCollection from './EditCollection';
 import EditCollectionTabular from './EditCollectionTabular';
-import Menu from './Menu';
 import utils from '../utils';
 
 const componentConstructor = (params, schemaPath, controller, parentPks) => {

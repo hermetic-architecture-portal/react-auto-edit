@@ -30,11 +30,8 @@ const componentConstructor = (params, schemaPath, controller, parentPks) => {
       rootComponent={true}
       />;
   }
-  return <div>
-    <Menu controller={controller} />
-    <div className="Ed-content">
-      {childElement}
-    </div>
+  return <div className="Ed-content">
+    {childElement}
   </div>;
 };
 

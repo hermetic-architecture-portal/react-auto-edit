@@ -7,15 +7,25 @@ import ItemContainer from './ItemContainer';
  * @typedef {import('./ApiProxy').default} ApiProxy
  */
 
+/**
+ * @typedef {Object} Options
+ * @property {string} baseClientPath - If the edit pages are to be based on a path other than the web root, provide it here (e.g /editors)
+ */
+
 class Controller {
   /**
+   * @param {*} schema - the Joi schema
    * @param {ApiProxy} apiProxy
+   * @param {Options} options
    */
-  constructor(schema, apiProxy, baseClientUrl, pageSize = 10) {
+  constructor(schema, apiProxy, options) {
+    const defaultOptions = {
+      baseClientPath: '',
+    };
+    const fullOptions = Object.assign(defaultOptions, options || {});
     this.schema = schema;
     this.apiProxy = apiProxy;
-    this.baseClientUrl = baseClientUrl;
-    this.pageSize = pageSize;
+    this.baseClientPath = fullOptions.baseClientPath;
     this.itemStore = new ItemStore(schema);
     this.searchResultPages = observable.map({});
   }
@@ -71,7 +81,7 @@ class Controller {
   }
 
   constructLinkUrl(itemSchemaPath, fieldName, parentIds, ids, schemaDesc, urlSoFar) {
-    const actualUrlSoFar = urlSoFar || this.baseClientUrl;
+    const actualUrlSoFar = urlSoFar || this.baseClientPath;
     const actualSchemaDesc = schemaDesc || this.schema.describe();
     const schemaPathChunks = itemSchemaPath
       .split('.')

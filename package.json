@@ -1,6 +1,6 @@
 {
   "name": "react-auto-edit",
-  "version": "2.0.3",
+  "version": "2.0.6",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -8,7 +8,6 @@
     "build": "babel src -d lib",
     "watch": "nodemon --ignore lib --exec \"babel src -d lib\""
   },
-  "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -23,27 +22,37 @@
     "eslint-plugin-react": "^7.13.0",
     "jest": "^24.8.0",
     "joi": "^14.3.1",
-    "mobx": "^5.9.0",
-    "mobx-react": "^5.4.3",
+    "joi-key-extensions": "^1.0.4",
     "nodemon": "^1.19.1",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^5.0.1"
   },
   "dependencies": {
     "clone-deep": "^4.0.1",
     "dayjs": "^1.8.15",
-    "joi-key-extensions": "^1.0.1",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "p-limit": "^2.2.0",
-    "react": "^16.8.3",
     "react-aria-menubutton": "^6.1.0",
-    "react-dom": "^16.8.3",
     "react-hotkeys": "^2.0.0",
-    "react-router-dom": "^4.3.1",
     "react-select": "^3.0.4",
     "react-tooltip": "^3.10.0",
     "uuid": "^3.3.2"
+  },
+  "peerDependencies": {
+    "react-router-dom": "*"
+  },
+  "keywords": [
+    "joi",
+    "react",
+    "mobx"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hermetic-architecture-portal/react-auto-edit"
+  },
+  "bugs": {
+    "url": "https://github.com/hermetic-architecture-portal/react-auto-edit/issues"
   }
 }

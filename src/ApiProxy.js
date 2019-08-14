@@ -2,12 +2,35 @@ import { observable } from 'mobx';
 import pLimit from 'p-limit';
 import utils from './utils';
 
+/**
+ * @typedef {Object} Options
+ * @property {number} concurrentFetchesLimit - Limits how many concurrent API calls can be made by the client
+ * @property {number} pageSize - results page size (where this is under client's control)
+ * @property {ApiProxy.pagingModes} pagingMode
+ * @property {ApiProxy.filterModes} filterMode
+ */
+
 class ApiProxy {
-  constructor(schema, baseApiPath, concurrentFetchesLimit = 100) {
+  /**
+   * @param {*} schema - the Joi schema
+   * @param {*} baseApiPath - the base URL for API calls
+   * @param {Options} options
+   */
+  constructor(schema, baseApiPath, options) {
+    const defaults = {
+      concurrentFetchesLimit: 100,
+      pagingMode: ApiProxy.pagingModes.clientSide,
+      filterMode: ApiProxy.filterModes.clientSide,
+      pageSize: 10,
+    };
+    const fullOptions = Object.assign(defaults, options || {});
     this.schema = schema;
     this.baseApiPath = baseApiPath;
+    this.pagingMode = fullOptions.pagingMode;
+    this.pageSize = fullOptions.pageSize;
+    this.filterMode = fullOptions.filterMode;
     this.inFlightItems = observable([]);
-    this.limit = pLimit(concurrentFetchesLimit);
+    this.limit = pLimit(fullOptions.concurrentFetchesLimit);
   }
 
   addInFlightItem(url, options) {
@@ -105,6 +128,20 @@ class ApiProxy {
     return undefined;
   }
 
+  getPageAndFilterParams(page, filter) {
+    const result = [];
+
+    if (this.pagingMode === ApiProxy.pagingModes.serverSide) {
+      result.push(`page=${page}`);
+      result.push(`pageSize=${this.pageSize}`);
+    }
+
+    if (filter && (this.filterMode === ApiProxy.filterModes.serverSide)) {
+      result.push(`filter=${encodeURIComponent(filter)}`);
+    }
+    return result;
+  }
+
   /**
    * @typedef PagedResult
    * @property {number} totalPages
@@ -115,11 +152,92 @@ class ApiProxy {
    */
   async fetchCollectionSummary(collectionSchemaPath, parentIds, page, filter) {
     let url = this.buildUrl(collectionSchemaPath, null, parentIds);
-    url = `${url}?page=${page}`;
-    if (filter) {
-      url = `${url}&filter=${encodeURIComponent(filter)}`;
+    url = `${url}?${this.getPageAndFilterParams(page, filter).join('&')}`;
+    const rawResult = await this.fetchJson(url);
+    return this.paginateAndFilterResults(rawResult, collectionSchemaPath, page, filter);
+  }
+
+  filterResults(itemSchemaDesc, items, filter) {
+    if ((this.filterMode === ApiProxy.filterModes.serverSide) || !filter) {
+      return items;
     }
-    return this.fetchJson(url);
+
+    const displayNameFieldNames = utils.getDisplayNameFieldNames(itemSchemaDesc);
+    if (!displayNameFieldNames.length) {
+      throw new Error('No display field');
+    }
+    const displayFieldName = displayNameFieldNames[0];
+    return items
+      .filter(x => (!filter)
+        || (x[displayFieldName].toUpperCase().includes(filter.toUpperCase())));
+  }
+
+
+  /**
+  * @return {PagedResult}
+  */
+  paginateResults(itemSchemaDesc, items, rawResult, page) {
+    if (this.pagingMode === ApiProxy.pagingModes.serverSide) {
+      return {
+        items,
+        totalPages: this.getTotalPagesFromRawResult(rawResult),
+      };
+    }
+    const displayNameFieldNames = utils.getDisplayNameFieldNames(itemSchemaDesc);
+    if (!displayNameFieldNames.length) {
+      throw new Error('No display field');
+    }
+    const displayFieldName = displayNameFieldNames[0];
+    const sortedArray = items
+      .sort((a, b) => a[displayFieldName].localeCompare(b[displayFieldName]));
+
+    const minIndex = (Number(page) * this.pageSize) - this.pageSize;
+    const maxIndex = minIndex + this.pageSize - 1;
+
+    let totalPages = Math.ceil(sortedArray.length / this.pageSize);
+    if (totalPages === 0) {
+      totalPages = 1;
+    }
+    return {
+      totalPages,
+      items: sortedArray.filter((x, index) => (index >= minIndex) && (index <= maxIndex)),
+    };
+  }
+
+  getTotalPagesFromRawResult(rawResult) {
+    return rawResult.totalPages;
+  }
+
+  /**
+  * @return {Array}
+  */
+  getItemsFromRawResult(rawResult) {
+    return (this.pagingMode === ApiProxy.pagingModes.clientSide)
+      ? (rawResult || []) : rawResult.items;
+  }
+
+  /**
+  * @return {PagedResult}
+  */
+  paginateAndFilterResults(rawResult, collectionSchemaPath, page, filter) {
+    if (!rawResult) {
+      return {
+        items: [],
+        totalPages: 1,
+      };
+    }
+    if ((this.filterMode === ApiProxy.filterModes.clientSide)
+      && (this.pagingMode === ApiProxy.pagingModes.serverSide)) {
+      throw new Error('Client side filtering of server side paged results is not supported');
+    }
+    let items = this.getItemsFromRawResult(rawResult);
+
+    const itemSchemaDesc = utils.reach(this.schema, `${collectionSchemaPath}.[]`)
+      .describe();
+
+    items = this.filterResults(itemSchemaDesc, items, filter);
+
+    return this.paginateResults(itemSchemaDesc, items, rawResult, page);
   }
 
   /**
@@ -165,5 +283,21 @@ class ApiProxy {
     return this.fetchJson(url, options);
   }
 }
+
+/**
+ * @enum {string}
+ */
+ApiProxy.filterModes = {
+  clientSide: 'clientSide',
+  serverSide: 'serverSide',
+};
+
+/**
+ * @enum {string}
+ */
+ApiProxy.pagingModes = {
+  clientSide: 'clientSide',
+  serverSide: 'serverSide',
+};
 
 export default ApiProxy;

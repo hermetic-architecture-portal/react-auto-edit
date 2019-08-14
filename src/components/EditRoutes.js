@@ -71,11 +71,11 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
   return result;
 };
 
-const EditRoutes = ({ basePath, controller }) => {
+const EditRoutes = ({ controller }) => {
   configure({
     ignoreTags: [],
   });
-  const routes = buildEditRoutes(basePath, controller);
+  const routes = buildEditRoutes(controller.baseClientPath, controller);
   return <React.Fragment>
     {routes}
   </React.Fragment>;

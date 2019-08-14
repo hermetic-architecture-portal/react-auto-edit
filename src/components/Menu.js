@@ -24,7 +24,7 @@ const Menu = ({ controller }) => {
         return <MenuItem value={utils.getFieldDisplayName(fieldName, fieldSchemaDesc)}
           key={fieldName}
           className="AriaMenuButton-menuItem">
-          <Link to={`${controller.baseClientUrl}/${fieldName}`}>
+          <Link to={`${controller.baseClientPath}/${fieldName}`}>
             <div>{utils.getFieldDisplayName(fieldName, fieldSchemaDesc)}</div>
           </Link>
         </MenuItem>;

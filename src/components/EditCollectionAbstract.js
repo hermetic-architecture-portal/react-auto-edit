@@ -118,7 +118,7 @@ class EditCollectionAbstract extends React.Component {
   }
 
   canGoPrev() {
-    return (this.status.page > 1) && !this.props.controller.dirty();
+    return this.status.page > 1;
   }
 
   prev() {
@@ -130,8 +130,7 @@ class EditCollectionAbstract extends React.Component {
   }
 
   canGoNext() {
-    return (this.status.page < this.getSearchResult().totalPages)
-      && !this.props.controller.dirty();
+    return this.status.page < this.getSearchResult().totalPages;
   }
 
   next() {

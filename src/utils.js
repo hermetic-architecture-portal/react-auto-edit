@@ -133,6 +133,23 @@ const objectsMatch = (schemaDesc, a, b) => {
     .every(pkFieldName => a[pkFieldName] === b[pkFieldName]);
 };
 
+const getDisplayNameFieldNames = (schemaDesc) => {
+  const result = Object
+    .getOwnPropertyNames(schemaDesc.children)
+    .filter(fieldName => schemaDesc.children[fieldName].meta
+      && schemaDesc.children[fieldName].meta
+        .some(meta => meta.displayName));
+  if (result.length) {
+    return result;
+  }
+  if (Object
+    .getOwnPropertyNames(schemaDesc.children)
+    .includes('name')) {
+    return ['name'];
+  }
+  return getPrimaryKeyFieldNames(schemaDesc);
+};
+
 export default {
   reach,
   findRule,
@@ -151,4 +168,5 @@ export default {
   getPrimaryKeyFieldNames,
   getFieldDisplayName,
   normaliseAlternativesSchema,
+  getDisplayNameFieldNames,
 };

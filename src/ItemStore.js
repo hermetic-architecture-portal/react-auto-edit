@@ -239,7 +239,12 @@ class ItemStore {
         if (di.changeType === ItemContainer.changeTypes.delete) {
           this.containers.remove(container);
         } else {
-          container.finalise(di.cleanParentIds, di.cleanItem);
+          let { cleanItem } = di;
+          if (di.saveResponse
+            && utils.hasGeneratedField(this.getItemSchemaDesc(di.collectionSchemaPath))) {
+            cleanItem = di.saveResponse;
+          }
+          container.finalise(di.cleanParentIds, cleanItem);
         }
       }
     });

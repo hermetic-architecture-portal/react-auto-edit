@@ -13,6 +13,7 @@ class DirtyItem {
     }
     this.changeType = changeType;
     this.saved = false;
+    this.saveResponse = undefined;
   }
 }
 

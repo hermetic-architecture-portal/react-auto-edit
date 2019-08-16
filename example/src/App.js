@@ -1,7 +1,7 @@
 import React from 'react';
 import VanillaJoi from 'joi';
 import { fkExtension, pkExtension } from 'joi-key-extensions';
-import { BrowserRouter as Router, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route } from 'react-router-dom';
 import {
   ApiProxy, Controller, EditRoutes, Menu, Loading,
 } from 'react-auto-edit';
@@ -49,7 +49,7 @@ const App = () => <Router>
     <Menu controller={controller} />
     <EditRoutes basePath="" controller={controller} />
     <Loading controller={controller} />
-    <Redirect exact from="/" to="/posts" />
+    <Route exact={true} path="/" component={() => <Redirect to="/posts" />}/>
   </React.Fragment>
 </Router>;
 

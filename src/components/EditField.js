@@ -24,7 +24,8 @@ const EditField = ({
   fieldName, container, controller,
 }) => {
   const fieldSchemaDesc = container.getFieldSchemaDesc(fieldName);
-  const readonly = utils.isPkField(fieldSchemaDesc) && !container.isNewItem();
+  const readonly = (utils.isPkField(fieldSchemaDesc) && !container.isNewItem())
+    || utils.isGeneratedField(fieldSchemaDesc);
   const isRequired = utils.isRequiredField(fieldSchemaDesc);
   const max = utils.findRuleArg(fieldSchemaDesc, 'max');
   const min = utils.findRuleArg(fieldSchemaDesc, 'min');

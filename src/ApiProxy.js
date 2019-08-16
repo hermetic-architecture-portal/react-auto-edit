@@ -76,6 +76,13 @@ class ApiProxy {
     return this.limit(() => this.innerFetchJson(url, options));
   }
 
+  static resolveToWordNull(value) {
+    if ((typeof value === 'undefined') || (value === null)) {
+      return 'null';
+    }
+    return value;
+  }
+
   buildUrl(schemaPath, ids, parentIds, schemaPathChunks, prevUrlParts, parentSchema) {
     const actualParentSchema = parentSchema || this.schema;
     const actualParentIds = parentIds || [];
@@ -91,7 +98,7 @@ class ApiProxy {
       if (actualParentIds.length) {
         const currentParentIds = actualParentIds[0];
         const pkUrlParts = pkFieldNames
-          .map(pk => currentParentIds[pk] || 'null')
+          .map(pk => ApiProxy.resolveToWordNull(currentParentIds[pk]))
           .map(value => encodeURIComponent(value));
         return this.buildUrl(
           schemaPath,
@@ -104,7 +111,7 @@ class ApiProxy {
       }
       if (ids) {
         const pkUrlParts = pkFieldNames
-          .map(pk => ids[pk] || 'null')
+          .map(pk => ApiProxy.resolveToWordNull(ids[pk]))
           .map(value => encodeURIComponent(value));
         return this.buildUrl(
           schemaPath,

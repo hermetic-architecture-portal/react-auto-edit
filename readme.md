@@ -91,6 +91,11 @@ React Auto Edit has some expectations of the Joi schema that controls it:
   * Joi.array
 * Some Joi attributes that React Auto Edit will respond to are:
   * fk() from [joi-key-extensions](https://www.npmjs.com/package/joi-key-extensions) - a select component will be shown, offering candidate values based on the foreign key reference
+  * meta({ displayName: true}) - fields tagged with this attribute are used as the display name fields for an entity
+  * meta({ generated: true })
+    * used to indicate the field is generated server side (e.g. SQL identity columns, audit fields)
+    * tagged field will be rendered as a readonly element
+    * when a newly created entity is saved React Auto Edit expects the POST API to return the object with server generated fields supplied.  It will update the client side entity with the server generated fields.
   * label() - field label to display
   * description() - a tooltip will be displayed by the field with the supplied description
   * max() - applied to number and string fields

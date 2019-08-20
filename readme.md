@@ -67,7 +67,7 @@ const App = () => <Router>
     <Menu controller={controller} />
     <EditRoutes basePath="" controller={controller} />
     <Loading controller={controller} />
-    <Redirect exact from="/" to="/posts" />
+    <Route exact={true} path="/" component={() => <Redirect to="/posts" />}/>
   </React.Fragment>
 </Router>;
 

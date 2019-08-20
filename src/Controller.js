@@ -54,7 +54,7 @@ class Controller {
             break;
           case ItemContainer.changeTypes.add:
             // eslint-disable-next-line no-await-in-loop
-            await this.apiProxy.postItem(
+            dirtyItem.saveResponse = await this.apiProxy.postItem(
               dirtyItem.collectionSchemaPath,
               dirtyItem.cleanParentIds,
               dirtyItem.cleanItem,
@@ -207,7 +207,8 @@ class Controller {
         .filter(fieldName => utils.isFkField(container.itemSchemaDesc.children[fieldName]));
       for (let i = 0; i < fkFieldNames.length; i += 1) {
         const fieldName = fkFieldNames[i];
-        if (data && data[fieldName]) {
+        if (data && (typeof data[fieldName] !== 'undefined')
+          && (data[fieldName] !== null)) {
           // need to load the summary for the fk lookup item so we can show the display name in the select box
           const tempContainer = new ItemContainer(container.metadata.collectionSchemaPath,
             container.metadata.parentIds, this.schema, container.itemSchemaDesc,

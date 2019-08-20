@@ -150,6 +150,13 @@ const getDisplayNameFieldNames = (schemaDesc) => {
   return getPrimaryKeyFieldNames(schemaDesc);
 };
 
+const isGeneratedField = fieldSchemaDesc => fieldSchemaDesc.meta
+  && fieldSchemaDesc.meta.some(m => m.generated);
+
+const hasGeneratedField = itemSchemaDesc => Object
+  .getOwnPropertyNames(itemSchemaDesc.children)
+  .some(fieldName => isGeneratedField(itemSchemaDesc.children[fieldName]));
+
 export default {
   reach,
   findRule,
@@ -169,4 +176,6 @@ export default {
   getFieldDisplayName,
   normaliseAlternativesSchema,
   getDisplayNameFieldNames,
+  isGeneratedField,
+  hasGeneratedField,
 };

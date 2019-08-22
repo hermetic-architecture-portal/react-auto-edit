@@ -20,13 +20,28 @@
 
 .Ed-react-select-container {
   display: inline-block;
-  font-size: 14px;
+  font-size: 12px;
   width: 200px;
 }
 
 .Ed-react-select__control {
-  min-height: 24px !important; 
-  height: 24px;
+  min-height: 26px !important;
+  height: 26px;
+  border-radius: 0px !important;
+}
+
+.Ed-react-select__value-container {
+  padding-left: 2px !important;
+  padding-right: 0px !important;
+}
+
+.Ed-react-select__indicator {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+.Ed-react-select__menu {
+  margin-top: 0px !important;
   border-radius: 0px !important;
 }
 

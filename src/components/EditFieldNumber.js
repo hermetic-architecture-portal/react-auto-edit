@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
  */
 const EditFieldNumber = ({
   fieldName, container, max, min, readonly,
-}) => <input type="number"
+}) => <input type="number" step="any"
   value={container.getItemFieldValue(fieldName)}
   max={max} min={min} readOnly={readonly}
   onChange={event => container.setItemFieldValue(fieldName, Number(event.target.value))} />;

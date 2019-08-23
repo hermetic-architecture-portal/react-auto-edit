@@ -2,6 +2,7 @@ import { observable } from 'mobx';
 import utils from './utils';
 import ItemStore from './ItemStore';
 import ItemContainer from './ItemContainer';
+import UIFactory from './UIFactory';
 
 /**
  * @typedef {import('./ApiProxy').default} ApiProxy
@@ -10,6 +11,7 @@ import ItemContainer from './ItemContainer';
 /**
  * @typedef {Object} Options
  * @property {string} baseClientPath - If the edit pages are to be based on a path other than the web root, provide it here (e.g /editors)
+ * @property {UIFactory} uiFactory - If you want to override the standard UI elements, provide an instance of a class that subclasses UIFactory here
  */
 
 class Controller {
@@ -21,6 +23,7 @@ class Controller {
   constructor(schema, apiProxy, options) {
     const defaultOptions = {
       baseClientPath: '',
+      uiFactory: false,
     };
     const fullOptions = Object.assign(defaultOptions, options || {});
     this.schema = schema;
@@ -28,6 +31,10 @@ class Controller {
     this.baseClientPath = fullOptions.baseClientPath;
     this.itemStore = new ItemStore(schema);
     this.searchResultPages = observable.map({});
+    /**
+     * @type {UIFactory}
+     */
+    this.uiFactory = fullOptions.uiFactory || new UIFactory();
   }
 
   dirty() {

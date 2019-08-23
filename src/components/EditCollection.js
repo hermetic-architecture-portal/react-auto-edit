@@ -1,7 +1,6 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
 import { HotKeys } from 'react-hotkeys';
-import EditItem from './EditItem';
 import EditCollectionAbstract from './EditCollectionAbstract';
 import utils from '../utils';
 
@@ -79,11 +78,12 @@ class EditCollection extends EditCollectionAbstract {
             {items}
           </div>
           <div className="Ed-right-col">
-            <EditItem schemaPath={`${schemaPath}.[]`}
-              key={currentContainer ? currentContainer.getKey() : 'empty'}
-              controller={controller}
-              container={currentContainer}
-            />
+            {controller.uiFactory.createEditItem({
+              controller,
+              collectionSchemaPath: schemaPath,
+              container: currentContainer,
+              wantTabularEditor: false,
+            })}
           </div>
         </div>
       </HotKeys>

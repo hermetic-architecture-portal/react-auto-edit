@@ -19,7 +19,7 @@ Edit myapp/src/App.js:
 import React from 'react';
 import VanillaJoi from 'joi';
 import { fkExtension, pkExtension } from 'joi-key-extensions';
-import { BrowserRouter as Router, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route } from 'react-router-dom';
 import {
   ApiProxy, Controller, EditRoutes, Menu, Loading,
 } from 'react-auto-edit';
@@ -141,6 +141,9 @@ The ApiProxy class is in charge of mapping data requests to REST API calls
     * options.filterMode - controls whether filter/search of collections is handled server or client side.  One of ApiProxy.filterModes.clientSide and ApiProxy.filterModes.serverSide.  Defaults to ApiProxy.filterModes.clientSide (i.e. the target REST API does not know how to filter results).
     * options.pageSize - controls the size of search result pages.  Defaults to 10.
 
+## UIFactory
+The UIFactory class creates instances of the React UI components.  If you use the standard React UI components then you don't need to worry about this class.
+
 ## Controller
 The Controller class is in charge of managing application state
 
@@ -149,6 +152,7 @@ The Controller class is in charge of managing application state
   * apiProxy - an instance of ApiProxy (or a subclass of ApiProxy)
   * options
     * options.baseClientPath - if you want the client URL routes for React Auto Edit to be mounted somewhere other than root, then specify the path here (e.g. '/editor)
+    * options.uiFactory - if you need to render different React components for editing a collection, item or field than standard, you can provide an instance of a UIFactory subclass here.
 
 ## Components
 
@@ -211,8 +215,13 @@ Props:
 
 ## Customisation
 
+React Auto Edit is designed to be highly customisable.  The project in `examples/customisation` demonstrates some of the available options.
+
 ### CSS
 You can override the classes in the supplied CSS file (static/Edit.css), or leave it out of your project altogether.
+
+### UIFactory
+If you want to return different React components than standard, subclass UIFactory, override the methods as needed and pass an instance of the subclass in the Controller options argument.  Refer to the `examples/customisation` project for examples of usage.
 
 ### ApiProxy
 If your target API does not correspond to the conventions expected by ApiProxy you can subclass ApiProxy and pass an instance of the subclass to Controller.
@@ -282,4 +291,4 @@ React Auto Edit is based on:
 * [MobX](https://mobx.js.org/) - for state management
 * [React Router](https://reacttraining.com/react-router/web/guides/quick-start) - for routing
 
-The example app uses https://jsonplaceholder.typicode.com as a sample API, with thanks.
+The example apps uses https://jsonplaceholder.typicode.com as a sample API, with thanks.

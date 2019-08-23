@@ -4,7 +4,6 @@ import ReactTooltip from 'react-tooltip';
 import { HotKeys } from 'react-hotkeys';
 import utils from '../utils';
 // eslint-disable-next-line import/no-cycle
-import EditItemTabular from './EditItemTabular';
 import constants from '../constants';
 import EditCollectionAbstract from './EditCollectionAbstract';
 
@@ -63,11 +62,14 @@ class EditCollectionTabular extends EditCollectionAbstract {
             <ReactTooltip />
           </th>;
         });
-    const items = searchResult.containers.map(c => <tr
-        key={c.getKey()}>
-        <EditItemTabular container={c}
-          controller={controller}
-        />
+    const items = searchResult.containers.map(container => <tr
+        key={container.getKey()}>
+        {controller.uiFactory.createEditItem({
+          controller,
+          container,
+          collectionSchemaPath: schemaPath,
+          wantTabularEditor: true,
+        })}
     </tr>);
     return <div className="Ed-single-col-wrapper">
       <HotKeys keyMap={{ INSERT: 'ctrl+i' }}

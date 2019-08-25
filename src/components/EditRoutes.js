@@ -1,8 +1,6 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { Route } from 'react-router-dom';
 import { configure } from 'react-hotkeys';
-import EditCollection from './EditCollection';
-import EditCollectionTabular from './EditCollectionTabular';
 import utils from '../utils';
 
 const componentConstructor = (params, schemaPath, controller, parentPks) => {
@@ -13,22 +11,12 @@ const componentConstructor = (params, schemaPath, controller, parentPks) => {
     });
     return result;
   });
-  let childElement;
-  if (EditCollectionTabular.canShowCollection(controller.schema, schemaPath)) {
-    childElement = <EditCollectionTabular
-      controller={controller}
-      schemaPath={schemaPath}
-      parentIds={parentIds}
-      rootComponent={true}
-      />;
-  } else {
-    childElement = <EditCollection
-      controller={controller}
-      schemaPath={schemaPath}
-      parentIds={parentIds}
-      rootComponent={true}
-      />;
-  }
+  const childElement = controller.uiFactory.createEditCollection({
+    controller,
+    collectionSchemaPath: schemaPath,
+    parentIds,
+    rootComponent: true,
+  });
   return <div className="Ed-content">
     {childElement}
   </div>;

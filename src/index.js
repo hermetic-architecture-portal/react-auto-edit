@@ -26,6 +26,7 @@ import EditRoutes from './components/EditRoutes';
 import Loading from './components/Loading';
 import Menu from './components/Menu';
 import SaveButton from './components/SaveButton';
+import UIFactory from './UIFactory';
 
 export {
   ApiProxy,
@@ -56,4 +57,5 @@ export {
   Loading,
   Menu,
   SaveButton,
+  UIFactory,
 };

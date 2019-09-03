@@ -1,7 +1,7 @@
 # The variables are here to enable testing of the pipeline
 variables:
  # set this to another branch when testing prod/master releases
- master_branch: refs/heads/feature/master
+ master_branch: refs/heads/master
  # set this to "prerelease" when testing prod/master releases
  master_tag: latest
 

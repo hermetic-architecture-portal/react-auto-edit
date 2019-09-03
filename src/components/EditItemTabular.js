@@ -2,6 +2,7 @@ import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
 // eslint-disable-next-line import/no-cycle
 import EditFieldGroupTabular from './EditFieldGroupTabular';
+import utils from '../utils';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -31,6 +32,11 @@ class EditItemTabular extends React.Component {
     controller.loadDetail(container);
   }
 
+  isHiddenField(container, fieldName) {
+    const fieldSchemaDesc = container.getFieldSchemaDesc(fieldName);
+    return (utils.isHiddenField(fieldSchemaDesc) ? 'Ed-field-hidden' : '');
+  }
+
   render() {
     const {
       controller, container,
@@ -41,10 +47,12 @@ class EditItemTabular extends React.Component {
 
     if (!container) {
       fields = Object.getOwnPropertyNames(itemSchemaDesc.children)
-        .map(fieldName => <td key={fieldName}></td>);
+        .map(fieldName => <td key={fieldName}
+          className={this.isHiddenField(container, fieldName)}></td>);
     } else {
       fields = Object.getOwnPropertyNames(itemSchemaDesc.children)
-        .map(fieldName => <td key={fieldName}>
+        .map(fieldName => <td key={fieldName}
+          className={this.isHiddenField(container, fieldName)}>
             <EditFieldGroupTabular
               key={`${fieldName}-${container.getKey()}`}
               container={container}

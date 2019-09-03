@@ -1,6 +1,6 @@
 const constants = {
   newIdField: '__newId',
-  bigStringSize: 80,
+  bigStringSize: 105,
 };
 
 export default constants;

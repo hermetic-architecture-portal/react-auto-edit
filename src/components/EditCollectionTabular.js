@@ -52,9 +52,11 @@ class EditCollectionTabular extends EditCollectionAbstract {
           if (utils.isRequiredField(fieldSchemaDesc)) {
             required = <div className="Ed-required-field"/>;
           }
+          const hiddenField = (utils.isHiddenField(fieldSchemaDesc) ? 'Ed-field-hidden' : '');
           const fieldDisplayName = utils.getFieldDisplayName(fieldName, fieldSchemaDesc);
           return <th key={fieldName}
             colSpan={(index === array.length - 1) ? 2 : 1}
+            className={hiddenField}
             >
             {fieldDisplayName}
             {required}

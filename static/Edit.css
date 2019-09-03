@@ -73,6 +73,10 @@
   vertical-align: top;
 }
 
+.Ed-field-hidden {
+  display: none;
+}
+
 .Ed-column-button {
   flex: none;
   width: 70px;

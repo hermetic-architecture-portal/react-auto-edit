@@ -24,13 +24,15 @@ const EditFieldGroup = ({
   if (utils.isRequiredField(fieldSchemaDesc)) {
     required = <div className="Ed-required-field"></div>;
   }
+  const hiddenField = (utils.isHiddenField(fieldSchemaDesc) ? 'Ed-field-hidden' : '');
   const errors = container.getValidationErrors(fieldName)
     .map((e, index) => <div key={index}>{e}</div>);
   const errorBlock = !errors.length ? undefined
     : <div className="Ed-validation-errors">
       {errors}
     </div>;
-  return <div className="Ed-field-group">
+
+  return <div className={`Ed-field-group ${hiddenField}`}>
     <ReactTooltip />
     <div className="Ed-field-name">
       {utils.getFieldDisplayName(fieldName, fieldSchemaDesc)}

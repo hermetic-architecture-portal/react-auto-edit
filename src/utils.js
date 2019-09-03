@@ -1,4 +1,4 @@
-import constants from "./constants";
+import constants from './constants';
 
 const isPkField = fieldSchemaDesc => fieldSchemaDesc.rules
   && fieldSchemaDesc.rules
@@ -157,6 +157,9 @@ const hasGeneratedField = itemSchemaDesc => Object
   .getOwnPropertyNames(itemSchemaDesc.children)
   .some(fieldName => isGeneratedField(itemSchemaDesc.children[fieldName]));
 
+const isHiddenField = fieldSchemaDesc => fieldSchemaDesc.meta
+  && fieldSchemaDesc.meta.some(m => m.hidden);
+
 export default {
   reach,
   findRule,
@@ -178,4 +181,5 @@ export default {
   getDisplayNameFieldNames,
   isGeneratedField,
   hasGeneratedField,
+  isHiddenField,
 };

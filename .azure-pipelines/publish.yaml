@@ -1,0 +1,64 @@
+trigger:
+  branches:
+    include:
+      - master
+
+# not triggered by pull requests
+# (these might come from a forked repo)
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- checkout: self
+  clean: true
+  # persistCredentials so we can push tags to the remote repo
+  persistCredentials: true
+
+# npmAuthenticate task expects an npmrc file to exist
+- script: echo "registry=https://registry.npmjs.org/" > .npmrc
+  displayName: "create npmrc"
+
+# npmAuthenticate is being used because the npm publish 
+# task doesn't handle tags
+- task: npmAuthenticate@0
+  inputs:
+    workingFile: .npmrc
+    customEndpoint: 'npmjs'
+
+# tag the git repo for the existing package version
+- script: |
+    git config user.email pipeline@dev.azure.com
+    git config user.name build-pipeline
+    VERSION=v`node -p "require('./package.json').version"`
+    echo "Version: $VERSION"
+    git tag $VERSION
+  displayName: tag version
+
+- script: |
+    npm install
+    npm run build
+  displayName: 'npm install'
+
+- script: |
+   npm run build
+  displayName: 'npm build'
+
+- script: |
+    npm run test
+  displayName: 'npm test'
+
+# for feature/bugfix branches publish with a beta tag
+- script: npm publish
+  displayName: 'npm publish'
+
+# update tags on remote repo
+- script: |
+    git push --tags
+  displayName: 'push to GitHub'

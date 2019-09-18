@@ -77,6 +77,15 @@ class ItemContainer {
     return this.metadata.changeType !== ItemContainer.changeTypes.none;
   }
 
+  // add custom validation error
+  addError(fieldName, message) {
+    // prevents adding the same error multiple times
+    const error = new ValidationError(fieldName, message);
+    if (!this.metadata.errors.includes(error)) {
+      this.metadata.errors.push(error);
+    }
+  }
+
   isNewItem() {
     return this.metadata.changeType === ItemContainer.changeTypes.add;
   }

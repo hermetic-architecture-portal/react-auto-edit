@@ -91,7 +91,9 @@ class UIFactory {
     if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.find(m => m.image)) {
       return <EditFieldImage readonly={readonly}
         fieldName={fieldName} required={isRequired}
-        container={container} />;
+        container={container}
+        maxFileSize={(fieldSchemaDesc.meta.find(m => m.maxFileSize) || constants).maxFileSize}
+        />;
     }
     if (fieldType === 'string') {
       if (max && (max >= constants.bigStringSize)) {

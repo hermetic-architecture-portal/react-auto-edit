@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
  */
 const CancelButton = ({ controller }) => {
   let className = 'Ed-button';
-  if (!controller.dirty()) {
+  if (!controller.isDirty()) {
     className = `${className} disabled`;
   }
   return <div className={className} onClick={() => controller.cancel()}>

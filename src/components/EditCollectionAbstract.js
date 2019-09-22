@@ -1,6 +1,7 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { observable } from 'mobx';
 import utils from '../utils';
+import ItemContainer from '../ItemContainer';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -20,34 +21,37 @@ class EditCollectionAbstract extends React.Component {
     this.addItem = this.addItem.bind(this);
   }
 
+  getUrl() {
+    return window.location.href;
+  }
+
+  setUrl(newUrl) {
+    window.history.replaceState(null, null, newUrl);
+  }
+
   extractStatus() {
     const result = {
       page: 1,
       filter: '',
     };
     if (this.props.rootComponent) {
-      const currentUrl = new window.URL(window.location.href);
+      const currentUrl = new window.URL(this.getUrl());
       if (currentUrl.searchParams.has('page')) {
         result.page = Number(currentUrl.searchParams.get('page'));
       }
       if (currentUrl.searchParams.has('filter')) {
         result.filter = currentUrl.searchParams.get('filter');
       }
-      const currentItem = {};
+      const searchParamsObj = {};
       const itemSchemaDesc = this.getItemSchemaDesc();
-      utils.getPrimaryKeyFieldNames(itemSchemaDesc)
-        .forEach((fieldName) => {
-          const searchParamName = `current_${fieldName}`;
-          if (currentUrl.searchParams.has(searchParamName)) {
-            let fieldValue = currentUrl.searchParams.get(searchParamName);
-            if (itemSchemaDesc.children[fieldName].type === 'number') {
-              fieldValue = Number(fieldValue);
-            }
-            currentItem[fieldName] = fieldValue;
-          }
-        });
-      if (Object.getOwnPropertyNames(currentItem).length) {
-        result.currentItem = currentItem;
+      currentUrl.searchParams.forEach((value, key) => {
+        if (key.startsWith('current_')) {
+          searchParamsObj[key.replace('current_', '')] = value;
+        }
+      });
+      const currentIds = ItemContainer.getIdsFromItem(searchParamsObj, itemSchemaDesc);
+      if (Object.getOwnPropertyNames(currentIds).length) {
+        result.currentItem = currentIds;
       }
     }
     return result;
@@ -55,25 +59,25 @@ class EditCollectionAbstract extends React.Component {
 
   encodeStatus() {
     if (this.props.rootComponent) {
-      const currentUrl = new window.URL(window.location.href);
+      const currentUrl = new window.URL(this.getUrl());
       const newSearchParams = [];
-      const pkFieldSearchParamNames = utils.getPrimaryKeyFieldNames(this.getItemSchemaDesc())
-        .map(fieldName => `current_${fieldName}`);
       currentUrl.searchParams.forEach((value, key) => {
-        if ((key !== 'filter') && (key !== 'page') && (key !== 'currentItem')
-          && !pkFieldSearchParamNames.includes(key)) {
+        if ((key !== 'filter') && (key !== 'page')
+          && !key.startsWith('current_')) {
           newSearchParams.push(`${key}=${encodeURIComponent(value)}`);
         }
       });
       newSearchParams.push(`page=${this.status.page}`);
       newSearchParams.push(`filter=${encodeURIComponent(this.status.filter)}`);
-      if (this.status.currentItem && !utils.isNewItem(this.status.currentItem)) {
-        const ids = utils.getPrimaryKeyFieldNames(this.getItemSchemaDesc())
-          .map(fieldName => `current_${fieldName}=${encodeURIComponent(this.status.currentItem[fieldName])}`);
-        newSearchParams.push(ids);
+      if (this.status.currentItem) {
+        const currentIds = ItemContainer
+          .getIdsFromItem(this.status.currentItem, this.getItemSchemaDesc());
+        Object.getOwnPropertyNames(currentIds).forEach((fieldName) => {
+          newSearchParams.push(`current_${fieldName}=${encodeURIComponent(this.status.currentItem[fieldName])}`);
+        });
       }
       const newUrl = `${window.location.pathname}?${newSearchParams.join('&')}`;
-      window.history.replaceState(null, null, newUrl);
+      this.setUrl(newUrl);
     }
   }
 
@@ -104,7 +108,7 @@ class EditCollectionAbstract extends React.Component {
   }
 
   setCurrentItem(item) {
-    this.status.currentItem = utils.getIds(this.getItemSchemaDesc(), item);
+    this.status.currentItem = ItemContainer.getIdsFromItem(item, this.getItemSchemaDesc());
     this.encodeStatus();
   }
 

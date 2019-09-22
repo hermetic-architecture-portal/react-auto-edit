@@ -2,12 +2,21 @@ import React from 'react'; // eslint-disable-line no-unused-vars
 import { Route } from 'react-router-dom';
 import { configure } from 'react-hotkeys';
 import utils from '../utils';
+import constants from '../constants';
 
 const componentConstructor = (params, schemaPath, controller, parentPks) => {
   const parentIds = parentPks.map((parentItemPks) => {
     const result = {};
-    parentItemPks.forEach((fieldName) => {
-      result[fieldName] = params[fieldName];
+    parentItemPks.forEach((fieldName, index) => {
+      // undefined PKs will end up as the string literal 'undefined'
+      // a bit yuk...
+      if (params[fieldName] !== 'undefined') {
+        result[fieldName] = params[fieldName];
+      }
+      const iidParam = `${constants.internalIdField}_${index}`;
+      if (params[iidParam]) {
+        result[constants.internalIdField] = params[iidParam];
+      }
     });
     return result;
   });
@@ -50,7 +59,7 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     const pkFieldsPart = pkFields
       .map(fieldName => `:${fieldName}`)
       .join('/');
-    const nextUrlPath = `${urlPath}/${pkFieldsPart}`;
+    const nextUrlPath = `${urlPath}/${pkFieldsPart}/:${constants.internalIdField}_${parentPks.length}?`;
     const nextParentPks = parentPks.slice();
     nextParentPks.push(pkFields);
 

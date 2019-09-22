@@ -9,7 +9,7 @@ import { GlobalHotKeys } from 'react-hotkeys';
  */
 const SaveButton = ({ controller }) => {
   let className = 'Ed-button';
-  if (!controller.dirty()) {
+  if (!controller.isDirty()) {
     className = `${className} disabled`;
   }
   return <div className={className} onClick={() => controller.save()}>

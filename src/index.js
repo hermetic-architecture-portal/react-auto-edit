@@ -1,6 +1,5 @@
 import ApiProxy from './ApiProxy';
 import Controller from './Controller';
-import DirtyItem from './DirtyItem';
 import ItemContainer from './ItemContainer';
 import ItemStore from './ItemStore';
 import utils from './utils';
@@ -31,7 +30,6 @@ import UIFactory from './UIFactory';
 export {
   ApiProxy,
   Controller,
-  DirtyItem,
   ItemContainer,
   ItemStore,
   utils,

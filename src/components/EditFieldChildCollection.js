@@ -17,7 +17,7 @@ const EditFieldChildCollection = ({
 }) => {
   const itemSchemaPath = `${container.metadata.collectionSchemaPath}.[]`;
   const fieldSchemaPath = `${itemSchemaPath}.${fieldName}`;
-  const ids = utils.getIds(container.itemSchemaDesc, container.item);
+  const ids = container.getIds();
   if (EditCollectionTabular.canShowCollection(
     controller.schema, fieldSchemaPath,
   )) {
@@ -30,7 +30,7 @@ const EditFieldChildCollection = ({
     </div>;
   }
   return <Link
-    to={controller.constructLinkUrl(itemSchemaPath, fieldName, container.metadata.parentIds, ids)}>
+    to={controller.constructLinkUrl(container, fieldName)}>
     Edit
   </Link>;
 };

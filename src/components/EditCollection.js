@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { HotKeys } from 'react-hotkeys';
 import EditCollectionAbstract from './EditCollectionAbstract';
 import utils from '../utils';
+import ItemContainer from '../ItemContainer';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -21,11 +22,11 @@ class EditCollection extends EditCollectionAbstract {
 
   async load() {
     await super.load();
+    const { parentIds, schemaPath } = this.props;
     const searchResult = this.getSearchResult();
-    const itemSchemaDesc = this.getItemSchemaDesc();
     const { currentItem } = this.status;
     if (currentItem && !searchResult.containers
-      .find(c => utils.objectsMatch(itemSchemaDesc, c.item, currentItem))) {
+      .find(c => c.matches(schemaPath, parentIds, currentItem))) {
       this.status.currentItem = null;
     }
     if (!this.status.currentItem) {
@@ -34,14 +35,13 @@ class EditCollection extends EditCollectionAbstract {
   }
 
   render() {
-    const { controller, schemaPath } = this.props;
+    const { parentIds, controller, schemaPath } = this.props;
     const searchResult = this.getSearchResult();
-    const itemSchemaDesc = this.getItemSchemaDesc();
     const { currentItem } = this.status;
     let currentContainer;
     if (currentItem) {
       currentContainer = searchResult.containers
-        .find(c => utils.objectsMatch(itemSchemaDesc, c.item, currentItem));
+        .find(c => c.matches(schemaPath, parentIds, currentItem));
     }
     const items = searchResult.containers.map((c) => {
       let className = 'Ed-container-link';

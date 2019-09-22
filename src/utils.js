@@ -1,5 +1,3 @@
-import constants from './constants';
-
 const isPkField = fieldSchemaDesc => fieldSchemaDesc.rules
   && fieldSchemaDesc.rules
     .some(r => r.name === 'pk');
@@ -95,43 +93,8 @@ const getFkTargetFieldName = (fieldSchemaDesc) => {
   return chunks[chunks.length - 1];
 };
 
-const allFieldsMatch = (a, b) => Object.getOwnPropertyNames(a)
-  .every(fieldName => a[fieldName] === b[fieldName])
-  && Object.getOwnPropertyNames(b)
-    .every(fieldName => a[fieldName] === b[fieldName]);
-
 const isRequiredField = fieldSchemaDesc => fieldSchemaDesc.flags
   && (fieldSchemaDesc.flags.presence === 'required');
-
-const getIds = (schemaDesc, item) => {
-  const ids = {};
-  if (!item) {
-    return ids;
-  }
-  if (item[constants.newIdField]) {
-    ids[constants.newIdField] = item[constants.newIdField];
-  } else {
-    getPrimaryKeyFieldNames(schemaDesc)
-      .forEach((pkFieldName) => {
-        ids[pkFieldName] = item[pkFieldName];
-      });
-  }
-  return ids;
-};
-
-const isNewItem = ids => !!ids[constants.newIdField];
-
-const objectsMatch = (schemaDesc, a, b) => {
-  if (a[constants.newIdField] && b[constants.newIdField]
-    && (a[constants.newIdField] === b[constants.newIdField])) {
-    return true;
-  }
-  if (a[constants.newIdField] || b[constants.newIdField]) {
-    return false;
-  }
-  return getPrimaryKeyFieldNames(schemaDesc)
-    .every(pkFieldName => a[pkFieldName] === b[pkFieldName]);
-};
 
 const getDisplayNameFieldNames = (schemaDesc) => {
   const result = Object
@@ -164,15 +127,11 @@ export default {
   reach,
   findRule,
   findRuleArg,
-  allFieldsMatch,
   getFkSchemaDesc,
   isRequiredField,
   isFkField,
   isPkField,
-  isNewItem,
   getFkPath,
-  getIds,
-  objectsMatch,
   getFkCollectionPath,
   getFkTargetFieldName,
   getPrimaryKeyFieldNames,

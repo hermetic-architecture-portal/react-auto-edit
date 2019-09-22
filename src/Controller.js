@@ -3,6 +3,7 @@ import utils from './utils';
 import ItemStore from './ItemStore';
 import ItemContainer from './ItemContainer';
 import UIFactory from './UIFactory';
+import constants from './constants';
 
 /**
  * @typedef {import('./ApiProxy').default} ApiProxy
@@ -37,7 +38,7 @@ class Controller {
     this.uiFactory = fullOptions.uiFactory || new UIFactory();
   }
 
-  dirty() {
+  isDirty() {
     return this.itemStore.isDirty();
   }
 
@@ -46,78 +47,102 @@ class Controller {
   }
 
   async save() {
-    const dirtyItems = this.itemStore.getDirtyItems();
+    const dirtyContainers = this.itemStore.getDirtyContainers();
     try {
-      for (let i = 0; i < dirtyItems.length; i += 1) {
-        const dirtyItem = dirtyItems[i];
-        switch (dirtyItem.changeType) {
+      for (let i = 0; i < dirtyContainers.length; i += 1) {
+        const container = dirtyContainers[i];
+        const cleanItem = container.getCleanItem();
+        this.itemStore.fixParentIds(container);
+        const cleanParentIds = container.getCleanParentIds();
+        let saveResponse;
+        switch (container.metadata.changeType) {
           case ItemContainer.changeTypes.delete:
             // eslint-disable-next-line no-await-in-loop
             await this.apiProxy.deleteItem(
-              `${dirtyItem.collectionSchemaPath}.[]`,
-              dirtyItem.cleanParentIds,
-              dirtyItem.cleanItem,
+              `${container.metadata.collectionSchemaPath}.[]`,
+              cleanParentIds,
+              cleanItem,
             );
             break;
           case ItemContainer.changeTypes.add:
             // eslint-disable-next-line no-await-in-loop
-            dirtyItem.saveResponse = await this.apiProxy.postItem(
-              dirtyItem.collectionSchemaPath,
-              dirtyItem.cleanParentIds,
-              dirtyItem.cleanItem,
+            saveResponse = await this.apiProxy.postItem(
+              container.metadata.collectionSchemaPath,
+              cleanParentIds,
+              cleanItem,
             );
+            if (saveResponse && utils.hasGeneratedField(container.itemSchemaDesc)) {
+              container.replaceItem(saveResponse);
+            }
             break;
           case ItemContainer.changeTypes.edit:
             // eslint-disable-next-line no-await-in-loop
             await this.apiProxy.putItem(
-              `${dirtyItem.collectionSchemaPath}.[]`,
-              dirtyItem.cleanParentIds,
-              dirtyItem.cleanItem,
+              `${container.metadata.collectionSchemaPath}.[]`,
+              cleanParentIds,
+              cleanItem,
             );
             break;
           default:
             throw new Error('Unsupported changeType');
         }
-        dirtyItem.saved = true;
+        this.itemStore.finaliseContainer(container);
       }
-      // window.location.reload();
     } catch (e) {
       console.error('Save error', e);
     }
-    this.itemStore.finaliseDirtyItems(dirtyItems);
   }
 
-  constructLinkUrl(itemSchemaPath, fieldName, parentIds, ids, schemaDesc, urlSoFar) {
-    const actualUrlSoFar = urlSoFar || this.baseClientPath;
-    const actualSchemaDesc = schemaDesc || this.schema.describe();
-    const schemaPathChunks = itemSchemaPath
+  /**
+   * @param {ItemContainer} container
+   * @param {string} fieldName
+   */
+  constructLinkUrl(container, fieldName) {
+    const schemaPathChunks = container.metadata.collectionSchemaPath
       .split('.')
       .filter(chunk => !!chunk);
-    if (!schemaPathChunks.length) {
-      return `${urlSoFar}/${fieldName}`;
-    }
-    const currentChunk = schemaPathChunks[0];
-    const nextSchemaPath = schemaPathChunks
-      .filter((item, index) => index > 0)
-      .join('.');
-    if (currentChunk === '[]') {
-      const nextSchemaDesc = actualSchemaDesc.items[0];
-      const idItem = parentIds.length ? parentIds[0] : ids;
-      const keys = utils.getPrimaryKeyFieldNames(nextSchemaDesc)
-        .map(pk => encodeURIComponent(idItem[pk]))
-        .join('/');
-      const nextParentIds = parentIds
-        .filter((item, index) => index > 0);
-      const nextUrl = `${actualUrlSoFar}/${keys}`;
-      return this.constructLinkUrl(
-        nextSchemaPath, fieldName, nextParentIds, ids, nextSchemaDesc, nextUrl,
-      );
-    }
-    const nextSchemaDesc = actualSchemaDesc.children[currentChunk];
-    const nextUrl = `${actualUrlSoFar}/${currentChunk}`;
-    return this.constructLinkUrl(
-      nextSchemaPath, fieldName, parentIds, ids, nextSchemaDesc, nextUrl,
-    );
+    schemaPathChunks.push('[]');
+    const urlParts = [];
+    let currentSchemaPath = '';
+    let parentIdsIndex = 0;
+    schemaPathChunks.forEach((pathChunk, index) => {
+      if (pathChunk === '[]') {
+        let ids;
+        let isNew = false;
+        if (index === schemaPathChunks.length - 1) {
+          ids = container.getIds();
+          isNew = container.isNewItem();
+        } else {
+          const parentContainer = this.itemStore.findContainer(
+            currentSchemaPath,
+            container.metadata.parentIds
+              .filter((item, parentIndex) => parentIndex < parentIdsIndex),
+            container.metadata.parentIds[parentIdsIndex],
+          );
+          if (parentContainer) {
+            ids = parentContainer.getIds();
+            isNew = parentContainer.isNewItem();
+          } else {
+            ids = container.metadata.parentIds[parentIdsIndex];
+          }
+          parentIdsIndex += 1;
+        }
+        const currentSchemaDesc = utils.reach(this.schema, `${currentSchemaPath}.[]`).describe();
+        const primaryKeyFields = utils.getPrimaryKeyFieldNames(currentSchemaDesc);
+        const keyValues = primaryKeyFields
+          .map(pk => encodeURIComponent(ids[pk]));
+        if (isNew) {
+          keyValues.push(encodeURIComponent(ids[constants.internalIdField]));
+        }
+        urlParts.push(...keyValues);
+      } else {
+        urlParts.push(pathChunk);
+      }
+      currentSchemaPath = currentSchemaPath ? `${currentSchemaPath}.${pathChunk}`
+        : pathChunk;
+    });
+    urlParts.push(fieldName);
+    return `${this.baseClientPath}/${urlParts.join('/')}`;
   }
 
   async loadSearchResult(collectionSchemaPath, parentIds, page, filter) {

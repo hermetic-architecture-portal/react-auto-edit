@@ -1,5 +1,6 @@
 import { observable, extendObservable } from 'mobx';
 import clone from 'clone-deep';
+import uuid from 'uuid/v4';
 import utils from './utils';
 import constants from './constants';
 
@@ -38,12 +39,21 @@ class ItemContainer {
       owners: [owner],
       changeType: ItemContainer.changeTypes.none,
     });
+    const extraFields = {};
+    extraFields[constants.internalIdField] = uuid();
+
     this.item = observable(item);
+    extendObservable(this.item, extraFields);
     this.setDirty(changeType);
+  }
+
+  replaceParentIds(parentIds) {
+    this.metadata.parentIds.replace(parentIds);
   }
 
   replaceItem(item) {
     Object.getOwnPropertyNames(this.item)
+      .filter(fieldName => fieldName !== constants.internalIdField)
       .forEach((fieldName) => { this.item[fieldName] = item[fieldName]; });
     const newProps = {};
     Object.getOwnPropertyNames(item)
@@ -104,10 +114,20 @@ class ItemContainer {
 
   getCleanItem() {
     const cleanItem = clone(this.item);
-    if (cleanItem[constants.newIdField]) {
-      delete cleanItem[constants.newIdField];
+    if (cleanItem[constants.internalIdField]) {
+      delete cleanItem[constants.internalIdField];
     }
     return cleanItem;
+  }
+
+  getCleanParentIds() {
+    return this.metadata.parentIds.map((idSet) => {
+      const cloned = clone(idSet);
+      if (cloned[constants.internalIdField]) {
+        delete cloned[constants.internalIdField];
+      }
+      return cloned;
+    });
   }
 
   validate() {
@@ -163,9 +183,7 @@ class ItemContainer {
     }
   }
 
-  finalise(cleanParentIds, cleanItem) {
-    this.replaceItem(cleanItem);
-    this.metadata.parentIds.replace(cleanParentIds);
+  finalise() {
     this.originalItem = null;
     if (this.metadata.changeType === ItemContainer.changeTypes.add) {
       // make sure it doesn't disappear off the collection view screen
@@ -207,15 +225,7 @@ class ItemContainer {
   }
 
   getKey() {
-    if (!this.item) {
-      return 'nullItem';
-    }
-    if (this.item[constants.newIdField]) {
-      return this.item[constants.newIdField];
-    }
-    return utils.getPrimaryKeyFieldNames(this.itemSchemaDesc)
-      .map(keyFieldName => this.item[keyFieldName] || 'null')
-      .join('-');
+    return this.item[constants.internalIdField];
   }
 
   getFieldSchemaDesc(fieldName) {
@@ -230,12 +240,16 @@ class ItemContainer {
     const fieldSchemaDesc = this.getFieldSchemaDesc(fieldName);
     const fkArgs = utils.findRuleArg(fieldSchemaDesc, 'fk');
     const fkParentIds = [];
-    if (fkArgs.options && fkArgs.options.parentFieldName) {
-      const fkParentValue = this.getItemFieldValue(fkArgs.options.parentFieldName);
+    const parentFieldPath = (fkArgs.options && fkArgs.options.parentFieldPath);
+    const parentFieldName = (fkArgs.options && fkArgs.options.parentFieldName)
+      || (parentFieldPath
+        && parentFieldPath.split('.').slice(-1)[0]);
+    if (parentFieldName) {
+      const fkParentValue = this.getItemFieldValue(parentFieldName);
       if (!fkParentValue) {
         return null;
       }
-      const fkParentFieldSchema = this.itemSchemaDesc.children[fkArgs.options.parentFieldName];
+      const fkParentFieldSchema = this.itemSchemaDesc.children[parentFieldName];
       const fkParentTargetFieldName = utils.getFkTargetFieldName(fkParentFieldSchema);
       const fkParentIdSet = {};
       fkParentIdSet[fkParentTargetFieldName] = fkParentValue;
@@ -262,6 +276,61 @@ class ItemContainer {
         return (otherFkArg && otherFkArg.options
           && (otherFkArg.options.parentFieldName === fieldName));
       });
+  }
+
+  matches(collectionSchemaPath, parentIds, ids, detailLevel) {
+    if (this.metadata.collectionSchemaPath !== collectionSchemaPath) {
+      return false;
+    }
+    if ((!this.metadata.parentIds) !== (!parentIds)) {
+      return false;
+    }
+    if (detailLevel && (this.metadata.detailLevel !== detailLevel)) {
+      return false;
+    }
+    if (!this.metadata.parentIds.every((parentIdSet, index) => ItemContainer
+      .idsMatch(parentIdSet, parentIds[index]))) {
+      return false;
+    }
+    if (!ids) {
+      return true;
+    }
+    return ItemContainer.idsMatch(this.getIds(), ids);
+  }
+
+  static getIdsFromItem(item, itemSchemaDesc) {
+    const ids = {};
+    ids[constants.internalIdField] = item[constants.internalIdField];
+    utils.getPrimaryKeyFieldNames(itemSchemaDesc)
+      .forEach((fieldName) => { ids[fieldName] = item[fieldName]; });
+    return ids;
+  }
+
+  getIds() {
+    return ItemContainer.getIdsFromItem(this.item, this.itemSchemaDesc);
+  }
+
+  static idsMatch(idsA, idsB) {
+    if (idsA[constants.internalIdField]
+      && (idsA[constants.internalIdField] === idsB[constants.internalIdField])) {
+      return true;
+    }
+    const fieldsA = Object.getOwnPropertyNames(idsA)
+      .filter(fieldName => fieldName !== constants.internalIdField)
+      .filter(fieldName => typeof idsA[fieldName] !== 'undefined');
+    const fieldsB = Object.getOwnPropertyNames(idsB)
+      .filter(fieldName => fieldName !== constants.internalIdField)
+      .filter(fieldName => typeof idsB[fieldName] !== 'undefined');
+    if (fieldsA.length !== fieldsB.length) {
+      return false;
+    }
+    // if there are no keys, you can't match anything
+    if (!fieldsA.length) {
+      return false;
+    }
+    const result = fieldsA.every(fieldName => idsA[fieldName] === idsB[fieldName])
+      && fieldsB.every(fieldName => idsA[fieldName] === idsB[fieldName]);
+    return result;
   }
 }
 

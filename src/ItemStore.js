@@ -18,6 +18,10 @@ class ItemStore {
     return this.containers.some(container => container.isDirty());
   }
 
+  hasErrors() {
+    return this.containers.some(container => container.metadata.errors.length);
+  }
+
   cancel() {
     const addedItems = this.containers
       .filter(c => c.metadata.changeType === ItemContainer.changeTypes.add);
@@ -205,7 +209,7 @@ class ItemStore {
     dirtyItems.forEach((di) => {
       const itemSchemaDesc = this.getItemSchemaDesc(di.collectionSchemaPath);
       Object.getOwnPropertyNames(itemSchemaDesc.children)
-        .filter(fieldName => utils.isFkField(itemSchemaDesc.children[fieldName]))
+        .filter(fieldName => utils.isFkField(itemSchemaDesc.children[fieldName]));
     });
     dirtyItems.forEach((di) => {
       // eslint-disable-next-line no-param-reassign

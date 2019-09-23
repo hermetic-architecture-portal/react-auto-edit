@@ -41,7 +41,7 @@ class Controller {
     return this.itemStore.isDirty();
   }
 
-  errors() {
+  hasErrors() {
     return this.itemStore.hasErrors();
   }
 

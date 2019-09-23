@@ -41,6 +41,10 @@ class Controller {
     return this.itemStore.isDirty();
   }
 
+  hasErrors() {
+    return this.itemStore.hasErrors();
+  }
+
   async cancel() {
     this.itemStore.cancel();
   }

@@ -1,10 +1,8 @@
 import { observable } from 'mobx';
-import uuid from 'uuid/v1';
 import clone from 'clone-deep';
 import utils from './utils';
 import ItemContainer from './ItemContainer';
 import constants from './constants';
-import DirtyItem from './DirtyItem';
 
 class ItemStore {
   constructor(schema) {
@@ -29,7 +27,7 @@ class ItemStore {
     this.containers.forEach(c => c.revert());
   }
 
-  getItemSchemaDesc(collectionSchemaPath) {
+  _getItemSchemaDesc(collectionSchemaPath) {
     if (this.schemaDescriptions.has(collectionSchemaPath)) {
       return this.schemaDescriptions.get(collectionSchemaPath);
     }
@@ -43,19 +41,8 @@ class ItemStore {
    * @return {ItemContainer[]}
    */
   getContainers(collectionSchemaPath, parentIds, owner) {
-    let containers = this.containers.filter((match) => {
-      if (match.metadata.collectionSchemaPath !== collectionSchemaPath) {
-        return false;
-      }
-      if ((!match.metadata.parentIds) !== (!parentIds)) {
-        return false;
-      }
-      if (!match.metadata.parentIds.every((parentIdSet, index) => utils
-        .allFieldsMatch(parentIdSet, parentIds[index]))) {
-        return false;
-      }
-      return true;
-    });
+    let containers = this.containers.filter(match => match
+      .matches(collectionSchemaPath, parentIds));
     if (owner) {
       containers = containers.filter(c => c.metadata.owners.includes(owner));
 
@@ -73,7 +60,6 @@ class ItemStore {
           .filter(c => c.metadata.changeType !== ItemContainer.changeTypes.delete);
       }
     }
-
     return containers;
   }
 
@@ -81,23 +67,8 @@ class ItemStore {
    * @return {ItemContainer}
    */
   findContainer(collectionSchemaPath, parentIds, ids, detailLevel) {
-    const itemSchemaDesc = this.getItemSchemaDesc(collectionSchemaPath);
-    return this.containers.find((match) => {
-      if (match.metadata.collectionSchemaPath !== collectionSchemaPath) {
-        return false;
-      }
-      if ((!match.metadata.parentIds) !== (!parentIds)) {
-        return false;
-      }
-      if (detailLevel && (match.metadata.detailLevel !== detailLevel)) {
-        return false;
-      }
-      if (!match.metadata.parentIds.every((parentIdSet, index) => utils
-        .allFieldsMatch(parentIdSet, parentIds[index]))) {
-        return false;
-      }
-      return utils.objectsMatch(itemSchemaDesc, match.item, ids);
-    });
+    return this.containers.find(match => match
+      .matches(collectionSchemaPath, parentIds, ids, detailLevel));
   }
 
   registerItemOwner(collectionSchemaPath, parentIds, ids, owner) {
@@ -107,16 +78,15 @@ class ItemStore {
 
   addContainer(collectionSchemaPath, parentIds) {
     const item = {};
-    item[constants.newIdField] = uuid();
     const container = new ItemContainer(collectionSchemaPath, parentIds,
-      this.schema, this.getItemSchemaDesc(collectionSchemaPath), item,
+      this.schema, this._getItemSchemaDesc(collectionSchemaPath), item,
       ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
       ItemContainer.changeTypes.add, this.toObject);
     this.containers.unshift(container);
     return container;
   }
 
-  purge(collectionSchemaPath, parentIds, owner) {
+  _purge(collectionSchemaPath, parentIds, owner) {
     if (![ItemContainer.owner.collectionSearch, ItemContainer.owner.lookupSearch]
       .includes(owner)) {
       return;
@@ -131,13 +101,13 @@ class ItemStore {
   }
 
   load(collectionSchemaPath, parentIds, items, detailLevel, owner) {
-    this.purge(collectionSchemaPath, parentIds, owner);
+    this._purge(collectionSchemaPath, parentIds, owner);
     items.forEach((item) => {
       const existingItem = this.findContainer(collectionSchemaPath, parentIds, item);
       if (!existingItem) {
         this.containers.push(new ItemContainer(
           collectionSchemaPath, parentIds,
-          this.schema, this.getItemSchemaDesc(collectionSchemaPath),
+          this.schema, this._getItemSchemaDesc(collectionSchemaPath),
           item, detailLevel, owner,
           ItemContainer.changeTypes.none,
           this.toObject,
@@ -151,10 +121,12 @@ class ItemStore {
     });
   }
 
-  static pokeItemIntoPath(item, path, schemaDesc, parentIds, data) {
+  static _pokeItemIntoPath(item, itemIds, path, schemaDesc, parentIds, data) {
     const pathChunks = path.split('.').filter(chunk => !!chunk);
     if (pathChunks.length === 0) {
-      data.push(item);
+      if (!data.find(match => ItemContainer.idsMatch(itemIds, match))) {
+        data.push(clone(item));
+      }
       return;
     }
     const currentChunk = pathChunks[0];
@@ -163,9 +135,17 @@ class ItemStore {
         const nextParentIds = parentIds.filter((x, index) => index > 0);
         const nextSchemaDesc = schemaDesc.items[0];
         const nextPath = pathChunks.filter((x, index) => index > 0).join('.');
-        const nextData = clone(parentIds[0]);
-        data.push(nextData);
-        ItemStore.pokeItemIntoPath(item, nextPath, nextSchemaDesc, nextParentIds, nextData);
+
+        let nextData = data.find(match => ItemContainer.idsMatch(
+          ItemContainer.getIdsFromItem(match, nextSchemaDesc),
+          parentIds[0],
+        ));
+        if (!nextData) {
+          nextData = clone(parentIds[0]);
+          data.push(nextData);
+        }
+        ItemStore
+          ._pokeItemIntoPath(item, itemIds, nextPath, nextSchemaDesc, nextParentIds, nextData);
       } else {
         throw Error('Unexpected path');
       }
@@ -179,18 +159,40 @@ class ItemStore {
         // eslint-disable-next-line no-param-reassign
         data[currentChunk] = data[currentChunk] || {};
       }
-      ItemStore.pokeItemIntoPath(item, nextPath, nextSchemaDesc, parentIds, data[currentChunk]);
+      ItemStore
+        ._pokeItemIntoPath(item, itemIds, nextPath, nextSchemaDesc, parentIds, data[currentChunk]);
+    }
+  }
+
+  static _recursiveCleanIids(data) {
+    if (Array.isArray(data)) {
+      data.forEach(item => ItemStore._recursiveCleanIids(item));
+    } else {
+      Object.getOwnPropertyNames(data)
+        .forEach((fieldName) => {
+          if (Array.isArray(data[fieldName])) {
+            ItemStore._recursiveCleanIids(data[fieldName]);
+          }
+        });
+      if (data[constants.internalIdField]) {
+        // eslint-disable-next-line no-param-reassign
+        delete data[constants.internalIdField];
+      }
     }
   }
 
   toObject() {
     const result = {};
-    this.containers.forEach((item) => {
-      ItemStore.pokeItemIntoPath(
-        item.item, item.metadata.collectionSchemaPath, this.schema.describe(),
-        item.metadata.parentIds, result,
+    this.containers.forEach((container) => {
+      ItemStore._pokeItemIntoPath(
+        container.item, container.getIds(),
+        container.metadata.collectionSchemaPath, this.schema.describe(),
+        container.metadata.parentIds, result,
       );
     });
+
+    ItemStore._recursiveCleanIids(result);
+
     return result;
   }
 
@@ -199,59 +201,45 @@ class ItemStore {
     container.validate(this.toObject());
   }
 
-  getDirtyItems() {
-    const dirtyItems = this.containers
+  /**
+   * @returns {ItemContainer[]}
+   */
+  getDirtyContainers() {
+    return this.containers
       .filter(c => c.isDirty())
-      .sort((a, b) => a.changeSequence - b.changeSequence)
-      .map(c => new DirtyItem(
-        c.metadata.collectionSchemaPath, c.metadata.parentIds, c.item, c.metadata.changeType,
-      ));
-    dirtyItems.forEach((di) => {
-      const itemSchemaDesc = this.getItemSchemaDesc(di.collectionSchemaPath);
-      Object.getOwnPropertyNames(itemSchemaDesc.children)
-        .filter(fieldName => utils.isFkField(itemSchemaDesc.children[fieldName]));
-    });
-    dirtyItems.forEach((di) => {
-      // eslint-disable-next-line no-param-reassign
-      di.cleanParentIds = di.originalParentIds
-        .map((parentIdSet) => {
-          if (!parentIdSet[constants.newIdField]) {
-            return parentIdSet;
-          }
-          const parentItemContainer = this.containers
-            .find(c => c.item[constants.newIdField] === parentIdSet[constants.newIdField]);
-          const cleanParentItem = parentItemContainer.getCleanItem();
-          const cleanParentIds = utils.getIds(
-            this.getItemSchemaDesc(parentItemContainer.metadata.collectionSchemaPath),
-            cleanParentItem,
-          );
-          return cleanParentIds;
-        });
-    });
-    return dirtyItems;
+      .sort((a, b) => a.changeSequence - b.changeSequence);
   }
 
   /**
    *
-   * @param {DirtyItem[]} dirtyItems
+   * @param {ItemContainer} container
    */
-  finaliseDirtyItems(dirtyItems) {
-    dirtyItems.forEach((di) => {
-      const container = this
-        .findContainer(di.collectionSchemaPath, di.originalParentIds, di.originalItem);
-      if (di.saved) {
-        if (di.changeType === ItemContainer.changeTypes.delete) {
-          this.containers.remove(container);
-        } else {
-          let { cleanItem } = di;
-          if (di.saveResponse
-            && utils.hasGeneratedField(this.getItemSchemaDesc(di.collectionSchemaPath))) {
-            cleanItem = di.saveResponse;
+  fixParentIds(container) {
+    const newParentIds = container.metadata.parentIds
+      .map((parentIdSet) => {
+        if (parentIdSet[constants.internalIdField]) {
+          const sourceContainer = this.containers
+            .find(c => c.item[constants.internalIdField]
+              === parentIdSet[constants.internalIdField]);
+          if (sourceContainer) {
+            return sourceContainer.getIds();
           }
-          container.finalise(di.cleanParentIds, cleanItem);
         }
-      }
-    });
+        return parentIdSet;
+      });
+    container.replaceParentIds(newParentIds);
+  }
+
+  /**
+   *
+   * @param {ItemContainer} container
+   */
+  finaliseContainer(container) {
+    if (container.metadata.changeType === ItemContainer.changeTypes.delete) {
+      this.containers.remove(container);
+    } else {
+      container.finalise();
+    }
   }
 }
 

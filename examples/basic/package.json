@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "joi": "^14.3.1",
-    "joi-key-extensions": "^1.0.6",
+    "joi-key-extensions": "^1.0.9",
     "react": "^16.9.0",
-    "react-auto-edit": "^2.0.12",
+    "react-auto-edit": "^2.1.0",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1"

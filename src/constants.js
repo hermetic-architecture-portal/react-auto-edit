@@ -1,5 +1,5 @@
 const constants = {
-  newIdField: '__newId',
+  internalIdField: '__iid',
   bigStringSize: 105,
 };
 

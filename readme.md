@@ -91,6 +91,9 @@ React Auto Edit has some expectations of the Joi schema that controls it:
   * Joi.array
 * Some Joi attributes that React Auto Edit will respond to are:
   * fk() from [joi-key-extensions](https://www.npmjs.com/package/joi-key-extensions) - a select component will be shown, offering candidate values based on the foreign key reference
+  * required() - a mandatory field indicator will be shown in the UI, and select components will not be clearable
+  * valid(...values) - a select component will be shown, restricting options to those in the values parameter, plus an empty value if the field is optional
+  * allow(...values) - for string fields, the options in the values parameter will be suggested / autocompleted, but the user will be free to enter any text that passes validation
   * meta({ displayName: true}) - fields tagged with this attribute are used as the display name fields for an entity
   * meta({ hidden: true}) - fields tagged with this attribute are hidden on the UI
   * meta({ generated: true })

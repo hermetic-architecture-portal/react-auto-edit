@@ -8,10 +8,25 @@ import { observer } from 'mobx-react';
  */
 const EditFieldString = ({
   fieldName, container, maxLength, minLength, readonly,
-}) => <input
-  type="text"
-  value={container.getItemFieldValue(fieldName)}
-  maxLength={maxLength} minLength={minLength} readOnly={readonly}
-  onChange={event => container.setItemFieldValue(fieldName, event.target.value)} />;
+  suggestedValues,
+}) => {
+  let datalist;
+  let datalistId;
+  if (suggestedValues && suggestedValues.length) {
+    datalistId = `datalist-${fieldName}-${container.getKey()}`;
+    datalist = <datalist id={datalistId}>
+      {suggestedValues.map(v => <option value={v}/>)}
+    </datalist>;
+  }
+  return <React.Fragment>
+    <input
+      list={datalistId}
+      type="text"
+      value={container.getItemFieldValue(fieldName)}
+      maxLength={maxLength} minLength={minLength} readOnly={readonly}
+      onChange={event => container.setItemFieldValue(fieldName, event.target.value)} />
+    {datalist}
+  </React.Fragment>;
+};
 
 export default observer(EditFieldString);

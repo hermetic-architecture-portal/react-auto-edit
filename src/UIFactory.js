@@ -15,6 +15,7 @@ import EditItem from './components/EditItem';
 import EditItemTabular from './components/EditItemTabular';
 import EditCollectionTabular from './components/EditCollectionTabular';
 import EditCollection from './components/EditCollection';
+import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
 
 /**
  * @typedef {import('./ItemContainer').default} ItemContainer
@@ -73,6 +74,18 @@ class UIFactory {
         container={container}
         isRequired={isRequired} />;
     }
+    if (utils.hasSuggestedValues(fieldSchemaDesc)
+      && utils.suggestedValuesOnly(fieldSchemaDesc)
+      && ((fieldType === 'number') || (fieldType === 'string'))) {
+      return <EditFieldRestrictedValues
+        readonly={readonly}
+        fieldName={fieldName}
+        isRequired={isRequired}
+        suggestedValues={utils.getSuggestedValues(fieldSchemaDesc)}
+        suggestedValuesOnly={utils.suggestedValuesOnly(fieldSchemaDesc)}
+        container={container}
+      />;
+    }
     if (fieldType === 'date') {
       const formatArg = utils.findRuleArg(fieldSchemaDesc, 'format');
       const format = (formatArg && formatArg.format.length) ? formatArg.format[0] : 'YYYY-MM-DD';
@@ -104,6 +117,7 @@ class UIFactory {
       return <EditFieldString readonly={readonly}
         fieldName={fieldName} required={isRequired}
         container={container}
+        suggestedValues={utils.getSuggestedValues(fieldSchemaDesc)}        
         maxLength={max}
         minLength={min} />;
     }

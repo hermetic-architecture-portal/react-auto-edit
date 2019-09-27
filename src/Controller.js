@@ -94,7 +94,9 @@ class Controller {
       }
     } catch (e) {
       console.error('Save error', e);
+      return false;
     }
+    return true;
   }
 
   /**

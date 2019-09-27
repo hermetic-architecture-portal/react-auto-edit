@@ -1,9 +1,11 @@
 import VanillaJoi from 'joi';
-import { pkExtension } from 'joi-key-extensions';
+import { pkExtension, fkExtension } from 'joi-key-extensions';
 import { Controller, ApiProxy, ItemContainer } from '../src/index';
 
 const Joi = VanillaJoi
-  .extend(pkExtension.string);
+  .extend(pkExtension.string)
+  .extend(pkExtension.number)
+  .extend(fkExtension.number);
 
 const schema = Joi.object({
   makes: Joi.array().items({
@@ -231,6 +233,113 @@ describe('Controller', () => {
         { modelId: 'swift' });
       const result = controller.constructLinkUrl(child, 'variants');
       expect(result).toBe('/makes/suzuki/models/swift/variants');
+    });
+  });
+  describe('loadDetail', () => {
+    it('loads the detail if not already loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      apiProxy.fetchJson.mockReturnValue({ makeId: 'ford', name: 'Ford' });
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes', [], [{ makeId: 'ford' }],
+        ItemContainer.detailLevel.summary, ItemContainer.owner.lookupSearch);
+      const container = controller.itemStore.findContainer('makes', [],
+        { makeId: 'ford' }, ItemContainer.detailLevel.summary);
+      expect(container).toBeTruthy();
+      await controller.loadDetail(container);
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/makes/ford');
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+      expect(container.item.name).toBe('Ford');
+    });
+    it('doesn\'t load the detail if already loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes', [], [{ makeId: 'ford' }],
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const container = controller.itemStore.findContainer('makes', [],
+        { makeId: 'ford' }, ItemContainer.detailLevel.detail);
+      expect(container).toBeTruthy();
+      await controller.loadDetail(container);
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(0);
+    });
+    it('loads foreign key lookup value', async () => {
+      const fkSchema = Joi.object({
+        parents: Joi.array().items({
+          parentId: Joi.number().pk(),
+          name: Joi.string(),
+        }),
+        children: Joi.array().items({
+          childId: Joi.number().pk(),
+          parentId: Joi.number().fk('parents.[].parentId'),
+        }),
+      });
+      const apiProxy = new ApiProxy(fkSchema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      const controller = new Controller(fkSchema, apiProxy);
+      controller.itemStore.load('children', [], [{ childId: 1 }],
+        ItemContainer.detailLevel.summary, ItemContainer.owner.summary);
+      const childContainer = controller.itemStore.findContainer('children', [],
+        { childId: 1 }, ItemContainer.detailLevel.summary);
+      expect(childContainer).toBeTruthy();
+      apiProxy.fetchJson.mockImplementation((url) => {
+        if (url === 'http://localhost/parents/2') {
+          return { parentId: 2, name: 'PARENT' };
+        }
+        if (url === 'http://localhost/children/1') {
+          return { childId: 1, parentId: 2 };
+        }
+        throw new Error(`unexpected URL ${url}`);
+      });
+      await controller.loadDetail(childContainer);
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(2);
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/parents/2');
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/children/1');
+      expect(childContainer.item.parentId).toBe(2);
+      const parentContainer = controller.itemStore.findContainer('parents', [],
+        { parentId: 2 }, ItemContainer.detailLevel.summary);
+      expect(parentContainer).toBeTruthy();
+    });
+    it('loads foreign key lookup value based on alternatives', async () => {
+      const fkSchema = Joi.object({
+        parents: Joi.array().items({
+          parentId: Joi.number().pk(),
+          name: Joi.string(),
+        }),
+        children: Joi.array().items({
+          childId: Joi.number().pk(),
+          parentId: Joi.number().fk('parents.[].parentId')
+            .when('childId', {
+              is: 12, then: Joi.any().forbidden(), otherwise: Joi.number().required(),
+            }),
+        }),
+      });
+      const apiProxy = new ApiProxy(fkSchema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      const controller = new Controller(fkSchema, apiProxy);
+      controller.itemStore.load('children', [], [{ childId: 1 }],
+        ItemContainer.detailLevel.summary, ItemContainer.owner.summary);
+      const childContainer = controller.itemStore.findContainer('children', [],
+        { childId: 1 }, ItemContainer.detailLevel.summary);
+      expect(childContainer).toBeTruthy();
+      apiProxy.fetchJson.mockImplementation((url) => {
+        if (url === 'http://localhost/parents/2') {
+          return { parentId: 2, name: 'PARENT' };
+        }
+        if (url === 'http://localhost/children/1') {
+          return { childId: 1, parentId: 2 };
+        }
+        throw new Error(`unexpected URL ${url}`);
+      });
+      await controller.loadDetail(childContainer);
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(2);
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/parents/2');
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/children/1');
+      expect(childContainer.item.parentId).toBe(2);
+      const parentContainer = controller.itemStore.findContainer('parents', [],
+        { parentId: 2 }, ItemContainer.detailLevel.summary);
+      expect(parentContainer).toBeTruthy();
     });
   });
 });

@@ -240,7 +240,9 @@ class Controller {
         container.metadata.parentIds, container.item,
       );
       const fkFieldNames = Object.getOwnPropertyNames(container.itemSchemaDesc.children)
-        .filter(fieldName => utils.isFkField(container.itemSchemaDesc.children[fieldName]));
+        .filter(fieldName => utils
+          .isFkField(utils
+            .normaliseAlternativesSchema(container.itemSchemaDesc.children[fieldName])));
       for (let i = 0; i < fkFieldNames.length; i += 1) {
         const fieldName = fkFieldNames[i];
         if (data && (typeof data[fieldName] !== 'undefined')

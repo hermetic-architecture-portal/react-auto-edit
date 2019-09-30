@@ -15,6 +15,8 @@
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
@@ -26,13 +28,17 @@
     "nodemon": "^1.19.1",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^4.3.1",
+    "react-test-renderer": "^16.10.1"
   },
   "dependencies": {
+    "base64-arraybuffer": "^0.2.0",
     "clone-deep": "^4.0.1",
-    "dayjs": "^1.8.15",
+    "dayjs": "^1.8.16",
+    "install": "^0.13.0",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
+    "npm": "^6.11.3",
     "p-limit": "^2.2.0",
     "react-aria-menubutton": "^6.1.0",
     "react-hotkeys": "^2.0.0",

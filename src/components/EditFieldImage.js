@@ -13,6 +13,8 @@ const readPromise = file => new Promise((resolve, reject) => {
  * @typedef {import('../ItemContainer').default} ItemContainer
  * @param {Object} props
  * @param {ItemContainer} props.container
+ * @param {string} props.fieldName
+ * @param {boolean} props.readonly
  */
 const EditFieldImage = ({
   fieldName, container, readonly,

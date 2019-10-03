@@ -86,3 +86,5 @@ typings/
 build/
 
 lib/
+
+types/

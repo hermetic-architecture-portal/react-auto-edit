@@ -5,6 +5,8 @@ import { observer } from 'mobx-react';
  * @typedef {import('../ItemContainer').default} ItemContainer
  * @param {Object} props
  * @param {ItemContainer} props.container
+ * @param {string} props.fieldName
+ * @param {boolean} props.readonly
  */
 const EditFieldBoolean = ({
   fieldName, container, readonly,

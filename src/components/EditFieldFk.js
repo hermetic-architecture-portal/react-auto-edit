@@ -5,10 +5,15 @@ import Select from 'react-select';
 /**
  * @typedef {import('../Controller').default} Controller
  * @typedef {import('../ItemContainer').default} ItemContainer
+ */
+
+/**
  * @typedef {object} Props
  * @prop {Controller} controller
  * @prop {ItemContainer} container
- *
+ */
+
+/**
  * @extends {React.Component<Props>}
  */
 class EditFieldFk extends React.Component {

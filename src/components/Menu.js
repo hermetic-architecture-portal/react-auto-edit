@@ -14,6 +14,7 @@ import CancelButton from './CancelButton';
  * @param {Controller} props.controller
  * @param {string} title - title of menu, optional
  * @param {*} titleComponent - React component to use for the title element, optional
+ * @param {Location} location - the current window.location
  */
 const Menu = ({
   controller, title, titleComponent, location,

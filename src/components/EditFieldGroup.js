@@ -10,6 +10,7 @@ import EditField from './EditField';
  * @param {Object} props
  * @param {ItemContainer} props.container
  * @param {Controller} props.controller
+ * @param {string} props.fieldName
  */
 const EditFieldGroup = ({
   fieldName, controller, container,

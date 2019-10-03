@@ -1,11 +1,12 @@
 {
   "name": "react-auto-edit",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "",
   "main": "lib/index.js",
+  "types": "types",
   "scripts": {
     "test": "jest",
-    "build": "babel src -d lib",
+    "build": "babel src -d lib && tsc",
     "watch": "nodemon --ignore lib --exec \"babel src -d lib\""
   },
   "author": "",
@@ -29,7 +30,8 @@
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-router-dom": "^4.3.1",
-    "react-test-renderer": "^16.10.1"
+    "react-test-renderer": "^16.10.1",
+    "typescript-temporary-fork-for-jsdoc": "^3.6.0-insiders.20190802"
   },
   "dependencies": {
     "base64-arraybuffer": "^0.2.0",

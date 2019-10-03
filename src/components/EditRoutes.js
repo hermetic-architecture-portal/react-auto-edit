@@ -68,6 +68,11 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
   return result;
 };
 
+/**
+ * @typedef {import('../Controller').default} Controller
+ * @param {Object} props
+ * @param {Controller} props.controller
+ */
 const EditRoutes = ({ controller }) => {
   configure({
     ignoreTags: [],

@@ -7,6 +7,7 @@ import utils from '../utils';
  * @param {Object} props
  * @param {Controller} props.controller
  * @param {ItemContainer} props.container
+ * @param {string} props.fieldName
  */
 const EditField = ({
   fieldName, container, controller,

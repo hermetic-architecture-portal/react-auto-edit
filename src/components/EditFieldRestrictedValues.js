@@ -6,6 +6,10 @@ import Select from 'react-select';
  * @typedef {import('../ItemContainer').default} ItemContainer
  * @param {Object} props
  * @param {ItemContainer} props.container
+ * @param {string} props.fieldName
+ * @param {boolean} props.isRequired
+ * @param {boolean} props.readonly
+ * @param {Array} props.suggestedValues
  */
 const EditFieldStringWithSuggestions = ({
   fieldName, container, readonly,

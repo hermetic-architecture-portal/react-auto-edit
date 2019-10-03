@@ -9,6 +9,9 @@ dayjs.extend(utc);
  * @typedef {import('../ItemContainer').default} ItemContainer
  * @param {Object} props
  * @param {ItemContainer} props.container
+ * @param {string} props.fieldName
+ * @param {boolean} props.readonly
+ * @param {string} props.format
  */
 const EditFieldDate = ({
   fieldName, container, readonly, format,

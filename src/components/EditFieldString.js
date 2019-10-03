@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
  * @param {string} props.fieldName
  * @param {number} props.maxLength
  * @param {number} props.minLength
- * @param {boolean} props.readOnly
+ * @param {boolean} props.readonly
  * @param {Array<string>} props.suggestedValues
  */
 const EditFieldString = ({

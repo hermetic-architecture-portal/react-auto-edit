@@ -50,4 +50,14 @@ describe('ApiProxy', () => {
       expect(result).toBe('http://example.com/makes/m1/models/mod1/variants/v1');
     });
   });
+  describe('collectionSummaryIncludesFullEntities', () => {
+    it('returns the value of options.collectionSummariesIncludesFullEntities', () => {
+      let instance = new ApiProxy(schema, 'http://example.com',{
+        collectionSummariesIncludesFullEntities: true,
+      });
+      expect(instance.collectionSummaryIncludesFullEntities('makes')).toBe(true);
+      instance = new ApiProxy(schema, 'http://example.com');
+      expect(instance.collectionSummaryIncludesFullEntities('makes')).toBe(false);
+    });
+  });
 });

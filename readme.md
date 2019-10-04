@@ -144,6 +144,7 @@ The ApiProxy class is in charge of mapping data requests to REST API calls
     * options.pagingMode - controls whether collection API calls should be paginated on the server side or client side. One of ApiProxy.pagingModes.clientSide and ApiProxy.pagingModes.serverSide.  Defaults to ApiProxy.pagingModes.clientSide (i.e. the target REST API is not pagination aware).
     * options.filterMode - controls whether filter/search of collections is handled server or client side.  One of ApiProxy.filterModes.clientSide and ApiProxy.filterModes.serverSide.  Defaults to ApiProxy.filterModes.clientSide (i.e. the target REST API does not know how to filter results).
     * options.pageSize - controls the size of search result pages.  Defaults to 10.
+    * options.collectionSummariesIncludesFullEntities - by default we assume REST API methods that return a collection of entities only include summary fields, and we need to call another API method to get a single entity to see all the fields.  If collectionSummariesIncludesFullEntities is true, then we accept the result of a collection API method as including the full entities, and don't make the extra calls.
 
 ## UIFactory
 The UIFactory class creates instances of the React UI components.  If you use the standard React UI components then you don't need to worry about this class.

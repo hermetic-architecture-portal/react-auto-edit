@@ -6,6 +6,7 @@ import utils from './utils';
  * @typedef {Object} Options
  * @property {number} concurrentFetchesLimit - Limits how many concurrent API calls can be made by the client
  * @property {number} pageSize - results page size (where this is under client's control)
+ * @property {boolean} collectionSummariesIncludesFullEntities - indicates that the API methods to get collection search results include all the entity fields and we don't need to seperately load detail
  * @property {ApiProxy.pagingModes} pagingMode
  * @property {ApiProxy.filterModes} filterMode
  */
@@ -21,6 +22,7 @@ class ApiProxy {
       concurrentFetchesLimit: 100,
       pagingMode: ApiProxy.pagingModes.clientSide,
       filterMode: ApiProxy.filterModes.clientSide,
+      collectionSummariesIncludesFullEntities: false,
       pageSize: 10,
     };
     const fullOptions = Object.assign(defaults, options || {});
@@ -28,6 +30,8 @@ class ApiProxy {
     this.baseApiPath = baseApiPath;
     this.pagingMode = fullOptions.pagingMode;
     this.pageSize = fullOptions.pageSize;
+    this.collectionSummariesIncludesFullEntities = fullOptions
+      .collectionSummariesIncludesFullEntities;
     this.filterMode = fullOptions.filterMode;
     this.inFlightItems = observable([]);
     this.limit = pLimit(fullOptions.concurrentFetchesLimit);
@@ -162,6 +166,11 @@ class ApiProxy {
     url = `${url}?${this.getPageAndFilterParams(page, filter).join('&')}`;
     const rawResult = await this.fetchJson(url);
     return this.paginateAndFilterResults(rawResult, collectionSchemaPath, page, filter);
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  collectionSummaryIncludesFullEntities(collectionSchemaPath) {
+    return !!this.collectionSummariesIncludesFullEntities;
   }
 
   filterResults(itemSchemaDesc, items, filter) {

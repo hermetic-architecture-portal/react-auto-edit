@@ -264,6 +264,21 @@ describe('Controller', () => {
       await controller.loadDetail(container);
       expect(apiProxy.fetchJson).toHaveBeenCalledTimes(0);
     });
+    it('doesn\'t load the detail if summary method returns full entities', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost', {
+        collectionSummariesIncludesFullEntities: true,
+      });
+      apiProxy.fetchJson = jest.fn();
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes', [], [{ makeId: 'ford' }],
+        ItemContainer.detailLevel.summary, ItemContainer.owner.summary);
+      const container = controller.itemStore.findContainer('makes', [],
+        { makeId: 'ford' }, ItemContainer.detailLevel.summary);
+      expect(container).toBeTruthy();
+      await controller.loadDetail(container);
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(0);
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+    });
     it('loads foreign key lookup value', async () => {
       const fkSchema = Joi.object({
         parents: Joi.array().items({

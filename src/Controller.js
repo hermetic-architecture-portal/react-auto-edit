@@ -235,6 +235,13 @@ class Controller {
    */
   async loadDetail(container) {
     if (container.metadata.detailLevel !== ItemContainer.detailLevel.detail) {
+      if (this.apiProxy
+        .collectionSummaryIncludesFullEntities(container.metadata.collectionSchemaPath)) {
+        // the API method to get collection summary returns full details so we don't need
+        // to call a REST API, just flag the existing container
+        container.upgradeSummaryToDetail(container.item);
+        return;
+      }
       const data = await this.apiProxy.fetchItemDetail(
         `${container.metadata.collectionSchemaPath}.[]`,
         container.metadata.parentIds, container.item,

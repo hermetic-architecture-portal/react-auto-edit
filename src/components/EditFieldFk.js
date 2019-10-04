@@ -17,9 +17,6 @@ import Select from 'react-select';
  * @extends {React.Component<Props>}
  */
 class EditFieldFk extends React.Component {
-  /**
-   * @param {Props} props
-   */
   constructor(props) {
     super(props);
     this.valueChanged = this.valueChanged.bind(this);

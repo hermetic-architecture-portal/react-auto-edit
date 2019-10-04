@@ -11,6 +11,7 @@ import utils from '../utils';
  * @param {Object} props
  * @param {ItemContainer} props.container
  * @param {Controller} props.controller
+ * @param {string} props.fieldName
  */
 const EditFieldChildCollection = ({
   fieldName, controller, container,

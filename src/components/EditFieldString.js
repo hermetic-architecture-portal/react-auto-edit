@@ -5,6 +5,11 @@ import { observer } from 'mobx-react';
  * @typedef {import('../ItemContainer').default} ItemContainer
  * @param {Object} props
  * @param {ItemContainer} props.container
+ * @param {string} props.fieldName
+ * @param {number} props.maxLength
+ * @param {number} props.minLength
+ * @param {boolean} props.readonly
+ * @param {Array<string>} props.suggestedValues
  */
 const EditFieldString = ({
   fieldName, container, maxLength, minLength, readonly,

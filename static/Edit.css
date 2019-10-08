@@ -355,7 +355,12 @@
 .Ed-image {
   display: inline-block;
 }
-
+.Ed-image input {
+  cursor: pointer;
+}
+.Ed-image .Ed-button {
+  vertical-align: top;
+}
 .Ed-image img {
   max-width: 300px;
 }

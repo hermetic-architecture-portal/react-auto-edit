@@ -16,10 +16,11 @@ import EditFieldDate from './components/EditFieldDate';
 import EditFieldFk from './components/EditFieldFk';
 import EditFieldGroup from './components/EditFieldGroup';
 import EditFieldGroupTabular from './components/EditFieldGroupTabular';
+import EditFieldImage from './components/EditFieldImage';
 import EditFieldNumber from './components/EditFieldNumber';
+import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
 import EditFieldString from './components/EditFieldString';
 import EditFieldUri from './components/EditFieldUri';
-import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
 import EditItem from './components/EditItem';
 import EditItemTabular from './components/EditItemTabular';
 import EditRoutes from './components/EditRoutes';
@@ -47,10 +48,11 @@ export {
   EditFieldFk,
   EditFieldGroup,
   EditFieldGroupTabular,
+  EditFieldImage,
   EditFieldNumber,
+  EditFieldRestrictedValues,
   EditFieldString,
   EditFieldUri,
-  EditFieldRestrictedValues,
   EditItem,
   EditItemTabular,
   EditRoutes,

@@ -47,7 +47,7 @@ const EditFieldImage = ({
         readOnly={readonly}
         onChange={fileSelected} />
     </div>
-    <div>{imgElement}</div>
+    {imgElement}
   </div>;
 };
 

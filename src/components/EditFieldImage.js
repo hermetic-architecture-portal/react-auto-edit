@@ -27,17 +27,29 @@ const EditFieldImage = ({
       container.setItemFieldValue(fieldName, base64Img);
     }
   };
-  const img = container.getItemFieldValue(fieldName);
-  const imgElement = img ? <img src={`data:image/png;base64,${img}`} alt=''/>
-    : <React.Fragment>No image</React.Fragment>;
+  const imageInput = React.createRef();
 
+  const removeImage = () => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Remove selected image?')) {
+      const base64Img = base64.encode('');
+      container.setItemFieldValue(fieldName, base64Img);
+      imageInput.current.value = '';
+    }
+  };
+  const img = container.getItemFieldValue(fieldName);
+  const imgElement = !img ? <React.Fragment>No image</React.Fragment>
+    : <div>
+        <img src={`data:image/png;base64,${img}`} alt=''/>
+        <div className="Ed-button" onClick={removeImage}>&nbsp;x&nbsp;</div>
+      </div>;
   return <div className='Ed-image'>
     <div>
-      <input type="file" accept="image/*" multiple={false}
+      <input type="file" accept="image/*" multiple={false} ref={imageInput}
         readOnly={readonly}
         onChange={fileSelected} />
     </div>
-    <div>{imgElement}</div>
+    {imgElement}
   </div>;
 };
 

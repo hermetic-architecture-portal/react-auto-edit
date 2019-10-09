@@ -50,7 +50,18 @@ class Controller {
     this.itemStore.cancel();
   }
 
-  async save() {
+  /**
+   * @param {boolean} force - forces the controller to attempt to save, even if there are client side validation errors outstanding
+   */
+  async save(force) {
+    if (this.hasErrors()) {
+      if (force) {
+        console.warn('Saving in spite of errors...');
+      } else {
+        this.uiFactory.alert('Sorry, the changes cannot be saved as there are validation errors that need to be corrected first');
+        return;
+      }
+    }
     const dirtyContainers = this.itemStore.getDirtyContainers();
     try {
       for (let i = 0; i < dirtyContainers.length; i += 1) {
@@ -91,10 +102,16 @@ class Controller {
             throw new Error('Unsupported changeType');
         }
         this.itemStore.finaliseContainer(container);
+        this.handleSaveSuccess();
       }
     } catch (e) {
       this.handleError(e, 'Save');
     }
+  }
+
+  // placeholder for anyone who wants to perform an action
+  // on save success
+  handleSaveSuccess() {
   }
 
   handleError(error, action) {

@@ -93,8 +93,14 @@ class Controller {
         this.itemStore.finaliseContainer(container);
       }
     } catch (e) {
-      console.error('Save error', e);
+      this.handleError(e, 'Save');
     }
+  }
+
+  handleError(error, action) {
+    console.error(action, error);
+    this.uiFactory.alert(`Error performing ${action}: ${error.message}`, 'Error');
+    throw error;
   }
 
   /**
@@ -150,26 +156,35 @@ class Controller {
   }
 
   async loadSearchResult(collectionSchemaPath, parentIds, page, filter) {
-    const data = await this.apiProxy
-      .fetchCollectionSummary(collectionSchemaPath, parentIds, page, filter);
-    this.itemStore.load(collectionSchemaPath, parentIds, data.items,
-      ItemContainer.detailLevel.summary, ItemContainer.owner.collectionSearch);
-    this.searchResultPages.set(collectionSchemaPath, data.totalPages);
+    try {
+      const data = await this.apiProxy
+        .fetchCollectionSummary(collectionSchemaPath, parentIds, page, filter);
+      this.itemStore.load(collectionSchemaPath, parentIds, data.items,
+        ItemContainer.detailLevel.summary, ItemContainer.owner.collectionSearch);
+      this.searchResultPages.set(collectionSchemaPath, data.totalPages);
+    } catch (e) {
+      this.handleError(e, 'Load Search Results');
+    }
   }
 
   /**
    * @param {ItemContainer} container
    */
   async loadFkLookupData(container, fieldName, filter) {
-    const fkMetadata = container.getForeignKeyMetadata(fieldName);
-    if (!fkMetadata.fkParentIds) {
-      return;
+    try {
+      const fkMetadata = container.getForeignKeyMetadata(fieldName);
+      if (!fkMetadata.fkParentIds) {
+        return;
+      }
+      const data = await this.apiProxy
+        .fetchCollectionSummary(
+          fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, 1, filter,
+        );
+      this.itemStore.load(fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, data.items,
+        ItemContainer.detailLevel.summary, ItemContainer.owner.lookupSearch);
+    } catch (e) {
+      this.handleError(e, 'Load Lookup Data');
     }
-    const data = await this.apiProxy
-      .fetchCollectionSummary(fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, 1, filter);
-
-    this.itemStore.load(fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, data.items,
-      ItemContainer.detailLevel.summary, ItemContainer.owner.lookupSearch);
   }
 
   /**
@@ -234,60 +249,64 @@ class Controller {
    * @param {ItemContainer} container
    */
   async loadDetail(container) {
-    if (container.metadata.detailLevel !== ItemContainer.detailLevel.detail) {
-      if (this.apiProxy
-        .collectionSummaryIncludesFullEntities(container.metadata.collectionSchemaPath)) {
-        // the API method to get collection summary returns full details so we don't need
-        // to call a REST API, just flag the existing container
-        container.upgradeSummaryToDetail(container.item);
-        return;
-      }
-      const data = await this.apiProxy.fetchItemDetail(
-        `${container.metadata.collectionSchemaPath}.[]`,
-        container.metadata.parentIds, container.item,
-      );
-      const fkFieldNames = Object.getOwnPropertyNames(container.itemSchemaDesc.children)
-        .filter(fieldName => utils
-          .isFkField(utils
-            .normaliseAlternativesSchema(container.itemSchemaDesc.children[fieldName])));
-      for (let i = 0; i < fkFieldNames.length; i += 1) {
-        const fieldName = fkFieldNames[i];
-        if (data && (typeof data[fieldName] !== 'undefined')
-          && (data[fieldName] !== null)) {
-          // need to load the summary for the fk lookup item so we can show the display name in the select box
-          const tempContainer = new ItemContainer(container.metadata.collectionSchemaPath,
-            container.metadata.parentIds, this.schema, container.itemSchemaDesc,
-            data, ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
-            ItemContainer.changeTypes.none);
-          const fkMetadata = tempContainer.getForeignKeyMetadata(fieldName);
-          if (fkMetadata.fkParentIds) {
-            const currentLookupItemIds = {};
-            currentLookupItemIds[fkMetadata.fkTargetFieldName] = data[fieldName];
+    try {
+      if (container.metadata.detailLevel !== ItemContainer.detailLevel.detail) {
+        if (this.apiProxy
+          .collectionSummaryIncludesFullEntities(container.metadata.collectionSchemaPath)) {
+          // the API method to get collection summary returns full details so we don't need
+          // to call a REST API, just flag the existing container
+          container.upgradeSummaryToDetail(container.item);
+          return;
+        }
+        const data = await this.apiProxy.fetchItemDetail(
+          `${container.metadata.collectionSchemaPath}.[]`,
+          container.metadata.parentIds, container.item,
+        );
+        const fkFieldNames = Object.getOwnPropertyNames(container.itemSchemaDesc.children)
+          .filter(fieldName => utils
+            .isFkField(utils
+              .normaliseAlternativesSchema(container.itemSchemaDesc.children[fieldName])));
+        for (let i = 0; i < fkFieldNames.length; i += 1) {
+          const fieldName = fkFieldNames[i];
+          if (data && (typeof data[fieldName] !== 'undefined')
+            && (data[fieldName] !== null)) {
+            // need to load the summary for the fk lookup item so we can show the display name in the select box
+            const tempContainer = new ItemContainer(container.metadata.collectionSchemaPath,
+              container.metadata.parentIds, this.schema, container.itemSchemaDesc,
+              data, ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
+              ItemContainer.changeTypes.none);
+            const fkMetadata = tempContainer.getForeignKeyMetadata(fieldName);
+            if (fkMetadata.fkParentIds) {
+              const currentLookupItemIds = {};
+              currentLookupItemIds[fkMetadata.fkTargetFieldName] = data[fieldName];
 
-            const currentLookupItemContainer = this.itemStore.findContainer(
-              fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, currentLookupItemIds,
-            );
+              const currentLookupItemContainer = this.itemStore.findContainer(
+                fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, currentLookupItemIds,
+              );
 
-            if (currentLookupItemContainer) {
-              this.itemStore.registerItemOwner(
-                fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds,
-                currentLookupItemIds, ItemContainer.owner.lookupInUse,
-              );
-            } else {
-              // eslint-disable-next-line no-await-in-loop
-              const summary = await this.apiProxy.fetchItemSummary(
-                fkMetadata.fkItemSchemaPath, fkMetadata.fkParentIds, currentLookupItemIds,
-              );
-              this.itemStore.load(
-                fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, [summary],
-                ItemContainer.detailLevel.summary, ItemContainer.owner.lookupInUse,
-              );
+              if (currentLookupItemContainer) {
+                this.itemStore.registerItemOwner(
+                  fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds,
+                  currentLookupItemIds, ItemContainer.owner.lookupInUse,
+                );
+              } else {
+                // eslint-disable-next-line no-await-in-loop
+                const summary = await this.apiProxy.fetchItemSummary(
+                  fkMetadata.fkItemSchemaPath, fkMetadata.fkParentIds, currentLookupItemIds,
+                );
+                this.itemStore.load(
+                  fkMetadata.fkCollectionSchemaPath, fkMetadata.fkParentIds, [summary],
+                  ItemContainer.detailLevel.summary, ItemContainer.owner.lookupInUse,
+                );
+              }
             }
           }
         }
+        container.registerOwner(ItemContainer.owner.detail);
+        container.upgradeSummaryToDetail(data);
       }
-      container.registerOwner(ItemContainer.owner.detail);
-      container.upgradeSummaryToDetail(data);
+    } catch (e) {
+      this.handleError(e, 'Load Detail');
     }
   }
 

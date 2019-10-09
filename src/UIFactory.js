@@ -104,7 +104,7 @@ class UIFactory {
     if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.find(m => m.image)) {
       return <EditFieldImage readonly={readonly}
         fieldName={fieldName} required={isRequired}
-        container={container} />;
+        container={container} controller={controller} />;
     }
     if (fieldType === 'string') {
       if (max && (max >= constants.bigStringSize)) {
@@ -187,6 +187,37 @@ class UIFactory {
       parentIds={parentIds}
       rootComponent={true}
       />;
+  }
+
+  /**
+   * Shows an alert message to the user
+   * Override if you want to use a DOM dialog component
+   * @param {string} message
+   * @param {string} title
+   */
+  alert(
+    message,
+    // eslint-disable-next-line no-unused-vars
+    title,
+  ) {
+    // eslint-disable-next-line no-alert
+    window.alert(message);
+  }
+
+  /**
+   * Shows a confirmation message to the user
+   * Override if you want to use a DOM dialog component
+   * @param {string} message
+   * @param {string} title
+   * @returns {boolean}
+   */
+  confirm(
+    message,
+    // eslint-disable-next-line no-unused-vars
+    title,
+  ) {
+    // eslint-disable-next-line no-alert
+    return window.confirm(message);
   }
 }
 

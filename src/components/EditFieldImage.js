@@ -11,13 +11,15 @@ const readPromise = file => new Promise((resolve, reject) => {
 
 /**
  * @typedef {import('../ItemContainer').default} ItemContainer
+ * @typedef {import('../Controller').default} Controller
  * @param {Object} props
  * @param {ItemContainer} props.container
  * @param {string} props.fieldName
  * @param {boolean} props.readonly
+ * @param {Controller} props.controller
  */
 const EditFieldImage = ({
-  fieldName, container, readonly,
+  fieldName, container, readonly, controller,
 }) => {
   const fileSelected = async (event) => {
     if (event.target.files.length) {
@@ -30,8 +32,7 @@ const EditFieldImage = ({
   const imageInput = React.createRef();
 
   const removeImage = () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm('Remove selected image?')) {
+    if (controller.uiFactory.confirm('Remove selected image?')) {
       const base64Img = base64.encode('');
       container.setItemFieldValue(fieldName, base64Img);
       imageInput.current.value = '';

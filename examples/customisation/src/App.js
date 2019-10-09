@@ -8,6 +8,8 @@ import {
   UIFactory, EditCollection,
 } from 'react-auto-edit';
 import 'react-auto-edit/static/Edit.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Joi = VanillaJoi
   .extend(fkExtension.number)
@@ -92,13 +94,30 @@ class CustomUIFactory extends UIFactory {
     }
     return baseResult;
   }
+
+  alert(message, title) {
+    toast(<div>
+      <h1>{title}</h1>
+      {message}
+    </div>);
+  }
 }
 
 const options = {
   uiFactory: new CustomUIFactory(),
 };
 
-const controller = new Controller(schema, apiProxy, options)
+class CustomController extends Controller {
+  handleError(error, action) {
+    this.uiFactory.alert(`Oh no - there was an error: ${error.message}`, `${action} Error`);
+  }
+
+  handleSaveSuccess() {
+    this.uiFactory.alert('Save Succeeded!', 'Success');
+  }
+}
+
+const controller = new CustomController(schema, apiProxy, options)
 
 const App = () => <Router>
   <React.Fragment>
@@ -108,6 +127,7 @@ const App = () => <Router>
     </Switch>
     <Loading controller={controller} />
     <Route exact={true} path="/" component={() => <Redirect to="/todos" />}/>
+    <ToastContainer/>
   </React.Fragment>
 </Router>;
 

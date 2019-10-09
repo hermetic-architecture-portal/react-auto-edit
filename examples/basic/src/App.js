@@ -41,6 +41,7 @@ const schema = Joi.object({
 const apiProxy = new ApiProxy(schema, 'https://jsonplaceholder.typicode.com', {
   pageSize: 10,
   concurrentFetchesLimit: 1,
+  collectionSummariesIncludesFullEntities: true,
 });
 const controller = new Controller(schema, apiProxy)
 

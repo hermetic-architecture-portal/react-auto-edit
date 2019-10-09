@@ -38,6 +38,7 @@ class CustomApiProxy extends ApiProxy {
 const apiProxy = new CustomApiProxy(schema, 'https://jsonplaceholder.typicode.com', {
   pageSize: 10,
   concurrentFetchesLimit: 1,
+  collectionSummariesIncludesFullEntities: true,
 });
 
 let CustomEditBooleanField = ({ container, fieldName }) => <select

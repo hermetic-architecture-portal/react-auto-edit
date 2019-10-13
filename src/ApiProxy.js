@@ -67,9 +67,7 @@ class ApiProxy {
       }
       return response.json();
     } catch (error) {
-      // eslint-disable-next-line no-alert
-      alert(`Error fetching ${url}: ${error.message}`);
-      throw error;
+      throw Error(`Error fetching ${url}: ${error.message}`);
     } finally {
       this.removeInFlightItem(url, options);
     }

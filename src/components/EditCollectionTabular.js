@@ -4,7 +4,6 @@ import ReactTooltip from 'react-tooltip';
 import { HotKeys } from 'react-hotkeys';
 import utils from '../utils';
 // eslint-disable-next-line import/no-cycle
-import constants from '../constants';
 import EditCollectionAbstract from './EditCollectionAbstract';
 
 /**
@@ -23,12 +22,6 @@ class EditCollectionTabular extends EditCollectionAbstract {
       const fieldSchemaDesc = itemSchemaDesc.children[fieldNames[i]];
       if (fieldSchemaDesc.type === 'array') {
         return false;
-      }
-      if (fieldSchemaDesc.type === 'string') {
-        const max = utils.findRuleArg(fieldSchemaDesc, 'max');
-        if (max && max >= constants.bigStringSize) {
-          return false;
-        }
       }
     }
     return true;

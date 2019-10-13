@@ -26,6 +26,11 @@ import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
  */
 
 /**
+ * @typedef {Object} UIFactoryOptions
+ * @property {string} preferredDisplayMode
+ */
+
+/**
  * @typedef {Object} FieldOptions
  * @property {Controller} controller
  * @property {string} collectionSchemaPath
@@ -58,6 +63,16 @@ import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
  */
 
 class UIFactory {
+  /**
+   * @param {UIFactoryOptions} options
+   */
+  constructor(options) {
+    const fullOptions = Object.assign({
+      preferredDisplayMode: UIFactory.displayModes.tabular,
+    }, options || {});
+    this.options = fullOptions;
+  }
+
   /**
    * @param {FieldOptions} options
    */
@@ -173,13 +188,24 @@ class UIFactory {
     const {
       controller, collectionSchemaPath, parentIds, rootComponent,
     } = options;
-    if (EditCollectionTabular.canShowCollection(controller.schema, collectionSchemaPath)) {
+
+    let mode = UIFactory.displayModes.masterDetail;
+    if (EditCollectionTabular.canShowCollection(controller.schema, collectionSchemaPath)
+      && (
+        (!rootComponent) // child collections can only be displayed inline with parent using tabular mode
+        || this.options.preferredDisplayMode === UIFactory.displayModes.tabular
+      )
+    ) {
+      mode = UIFactory.displayModes.tabular;
+    }
+
+    if (mode === UIFactory.displayModes.tabular) {
       return <EditCollectionTabular
-        controller={controller}
-        schemaPath={collectionSchemaPath}
-        parentIds={parentIds}
-        rootComponent={rootComponent}
-        />;
+      controller={controller}
+      schemaPath={collectionSchemaPath}
+      parentIds={parentIds}
+      rootComponent={rootComponent}
+      />;
     }
     return <EditCollection
       controller={controller}
@@ -220,5 +246,10 @@ class UIFactory {
     return window.confirm(message);
   }
 }
+
+UIFactory.displayModes = {
+  tabular: 'TABULAR',
+  masterDetail: 'MASTERDETAIL',
+};
 
 export default UIFactory;

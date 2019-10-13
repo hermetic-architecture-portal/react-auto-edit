@@ -148,6 +148,8 @@ The ApiProxy class is in charge of mapping data requests to REST API calls
 
 ## UIFactory
 The UIFactory class creates instances of the React UI components.  If you use the standard React UI components then you don't need to worry about this class.
+* constructor - new UIFactory(options)
+  * preferredDisplayMode - controls which display mode should be used where possible.  One of UIFactory.displayModes.tabular or UIFactory.displayModes.masterDetail.
 
 ## Controller
 The Controller class is in charge of managing application state
@@ -157,7 +159,7 @@ The Controller class is in charge of managing application state
   * apiProxy - an instance of ApiProxy (or a subclass of ApiProxy)
   * options
     * options.baseClientPath - if you want the client URL routes for React Auto Edit to be mounted somewhere other than root, then specify the path here (e.g. '/editor)
-    * options.uiFactory - if you need to render different React components for editing a collection, item or field than standard, you can provide an instance of a UIFactory subclass here.
+    * options.uiFactory - if you need to render different React components for editing a collection, item or field than standard, you can provide an instance of a UIFactory or subclass here.
 
 ## Components
 

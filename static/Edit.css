@@ -142,6 +142,17 @@
   height: 70px;
 }
 
+.Ed-tabular-collection textarea {
+  resize: none;
+  height: 1em;
+}
+
+.Ed-tabular-collection textarea:focus {
+  height: 70px;
+  width: 230px;
+  position: absolute;
+}
+
 .Ed-left-col {
   flex: 30%;
   margin: 4px;
@@ -176,6 +187,15 @@
 .Ed-menu {
   background-color: lightgray;
   padding: 4px;
+  font-family: sans-serif;
+}
+
+.Ed-content {
+  font-family: sans-serif;
+}
+
+.Ed-content textarea {
+  font-family: sans-serif;
 }
 
 .Ed-menu-button {

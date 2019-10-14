@@ -58,6 +58,7 @@ class Controller {
       if (force) {
         console.warn('Saving in spite of errors...');
       } else {
+        // eslint-disable-next-line max-len
         this.uiFactory.alert('Sorry, the changes cannot be saved as there are validation errors that need to be corrected first');
         return;
       }
@@ -272,6 +273,10 @@ class Controller {
         collectionSchemaPath, parentIds, ItemContainer.owner.collectionSearch,
       ),
     };
+  }
+
+  findContainer(collectionSchemaPath, parentIds, ids) {
+    return this.itemStore.findContainer(collectionSchemaPath, parentIds, ids);
   }
 
   /**

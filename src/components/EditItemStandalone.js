@@ -1,6 +1,5 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
-import EditItem from './EditItem';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -13,7 +12,7 @@ import EditItem from './EditItem';
  *
  * @extends {React.Component<Props>}
  */
-class EditItemWrapper extends React.Component {
+class EditItemStandalone extends React.Component {
   componentDidMount() {
     this.load();
   }
@@ -36,8 +35,12 @@ class EditItemWrapper extends React.Component {
     if (!container) {
       return <div></div>;
     }
-    return <EditItem container={container} controller={controller} />;
+    return controller.uiFactory.createEditItem({
+      wantTabularEditor: false,
+      container,
+      controller,
+    });
   }
 }
 
-export default observer(EditItemWrapper);
+export default observer(EditItemStandalone);

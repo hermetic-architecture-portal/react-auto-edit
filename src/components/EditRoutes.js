@@ -5,19 +5,19 @@ import utils from '../utils';
 import constants from '../constants';
 
 const componentConstructor = (params, schemaPath, controller, parentPks) => {
-  const parentIds = parentPks.map((parentItemPks) => {
+  const parentIds = parentPks.map((parentItemPks, index) => {
     const result = {};
-    parentItemPks.forEach((fieldName, index) => {
+    parentItemPks.forEach((fieldName) => {
       // undefined PKs will end up as the string literal 'undefined'
       // a bit yuk...
       if (params[fieldName] !== 'undefined') {
         result[fieldName] = params[fieldName];
       }
-      const iidParam = `${constants.internalIdField}_${index}`;
-      if (params[iidParam]) {
-        result[constants.internalIdField] = params[iidParam];
-      }
     });
+    const iidParam = `${constants.internalIdField}_${index}`;
+    if (params[iidParam]) {
+      result[constants.internalIdField] = params[iidParam];
+    }
     return result;
   });
   const childElement = controller.uiFactory.createEditCollection({

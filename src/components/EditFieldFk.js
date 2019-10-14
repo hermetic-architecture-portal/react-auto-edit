@@ -73,6 +73,7 @@ class EditFieldFk extends React.Component {
       isClearable={!isRequired}
       isDisabled={readonly}
       onInputChange={this.filterChanged}
+      menuPortalTarget={document.body}
       onMenuOpen={this.menuOpen}
       options={lookupData}
       getOptionLabel={optionContainer => optionContainer.getDisplayName()}

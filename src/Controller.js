@@ -172,7 +172,19 @@ class Controller {
     return `${this.baseClientPath}/${urlParts.join('/')}`;
   }
 
+  _shouldLoadSearchResult(parentIds) {
+    // should not attempt to load child collection from server side
+    // if one of the parents is a new item (since children can't exist server side)
+    return !parentIds.some(parentIdSet => this.itemStore.containers
+      .some(c => (c.item[constants.internalIdField] === parentIdSet[constants.internalIdField])
+        && c.isNewItem()));
+  }
+
   async loadSearchResult(collectionSchemaPath, parentIds, page, filter) {
+    if (!this._shouldLoadSearchResult(parentIds)) {
+      this.searchResultPages.set(collectionSchemaPath, 1);
+      return;
+    }
     try {
       const data = await this.apiProxy
         .fetchCollectionSummary(collectionSchemaPath, parentIds, page, filter);

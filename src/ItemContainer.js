@@ -63,6 +63,7 @@ class ItemContainer {
   }
 
   upgradeSummaryToDetail(item) {
+    this.registerOwner(ItemContainer.owner.detail);
     this.metadata.detailLevel = ItemContainer.detailLevel.detail;
     this.replaceItem(item);
   }

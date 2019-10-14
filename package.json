@@ -1,6 +1,6 @@
 {
   "name": "react-auto-edit",
-  "version": "2.2.12",
+  "version": "2.3.0",
   "description": "",
   "main": "lib/index.js",
   "types": "types",
@@ -45,6 +45,7 @@
     "react-aria-menubutton": "^6.1.0",
     "react-hotkeys": "^2.0.0",
     "react-select": "^3.0.4",
+    "react-tether": "^2.0.4",
     "react-tooltip": "^3.10.0",
     "uuid": "^3.3.2"
   },

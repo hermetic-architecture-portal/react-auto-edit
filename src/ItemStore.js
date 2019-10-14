@@ -103,7 +103,9 @@ class ItemStore {
   load(collectionSchemaPath, parentIds, items, detailLevel, owner) {
     this._purge(collectionSchemaPath, parentIds, owner);
     items.forEach((item) => {
-      const existingItem = this.findContainer(collectionSchemaPath, parentIds, item);
+      const itemIds = ItemContainer
+        .getIdsFromItem(item, this._getItemSchemaDesc(collectionSchemaPath));
+      const existingItem = this.findContainer(collectionSchemaPath, parentIds, itemIds);
       if (!existingItem) {
         this.containers.push(new ItemContainer(
           collectionSchemaPath, parentIds,

@@ -4,28 +4,55 @@ import { configure } from 'react-hotkeys';
 import utils from '../utils';
 import constants from '../constants';
 
-const componentConstructor = (params, schemaPath, controller, parentPks) => {
-  const parentIds = parentPks.map((parentItemPks) => {
+const castParam = (value, fieldSchemaDesc) => {
+  if (fieldSchemaDesc.type === 'number') {
+    return Number(value);
+  }
+  return value;
+};
+
+const componentConstructor = (params, schemaPath, controller, parentPks, itemPks) => {
+  const parentIds = parentPks.map((parentItemPks, index) => {
     const result = {};
-    parentItemPks.forEach((fieldName, index) => {
+    parentItemPks.forEach((pk) => {
       // undefined PKs will end up as the string literal 'undefined'
       // a bit yuk...
-      if (params[fieldName] !== 'undefined') {
-        result[fieldName] = params[fieldName];
-      }
-      const iidParam = `${constants.internalIdField}_${index}`;
-      if (params[iidParam]) {
-        result[constants.internalIdField] = params[iidParam];
+      if (params[pk.fieldName] !== 'undefined') {
+        result[pk.fieldName] = castParam(params[pk.fieldName], pk.fieldSchemaDesc);
       }
     });
+    const iidParam = `${constants.internalIdField}_${index}`;
+    if (params[iidParam]) {
+      result[constants.internalIdField] = params[iidParam];
+    }
     return result;
   });
-  const childElement = controller.uiFactory.createEditCollection({
-    controller,
-    collectionSchemaPath: schemaPath,
-    parentIds,
-    rootComponent: true,
-  });
+  const ids = {};
+  if (itemPks) {
+    itemPks.forEach((pk) => {
+      if (params[pk.fieldName] !== 'undefined') {
+        ids[pk.fieldName] = castParam(params[pk.fieldName], pk.fieldSchemaDesc);
+      }
+    });
+    const iidParam = `${constants.internalIdField}_${parentPks.length}`;
+    ids[constants.internalIdField] = params[iidParam];
+  }
+  let childElement;
+  if (itemPks) {
+    childElement = controller.uiFactory.createEditItemStandalone({
+      controller,
+      collectionSchemaPath: schemaPath,
+      parentIds,
+      ids,
+    });
+  } else {
+    childElement = controller.uiFactory.createEditCollection({
+      controller,
+      collectionSchemaPath: schemaPath,
+      parentIds,
+      rootComponent: true,
+    });
+  }
   return <div className="Ed-content">
     {childElement}
   </div>;
@@ -47,6 +74,7 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     && schemaDesc.items.length
     && schemaDesc.items[0].type === 'object') {
     const currentSchemaPath = schemaPath || '';
+    // add route to collection
     result.push(<Route key={urlPath}
       path={urlPath} exact={true}
       component={({ match }) => componentConstructor(
@@ -55,11 +83,27 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     />);
     const nextSchemaPath = currentSchemaPath ? `${currentSchemaPath}.[]` : '[]';
     const nextSchemaDesc = utils.reach(controller.schema, nextSchemaPath).describe();
-    const pkFields = utils.getPrimaryKeyFieldNames(nextSchemaDesc);
+    const pkFields = utils.getPrimaryKeyFieldNames(nextSchemaDesc)
+      .map(fieldName => ({
+        fieldName,
+        fieldSchemaDesc: nextSchemaDesc.children[fieldName],
+      }));
     const pkFieldsPart = pkFields
-      .map(fieldName => `:${fieldName}`)
+      .map(pk => `:${pk.fieldName}`)
       .join('/');
-    const nextUrlPath = `${urlPath}/${pkFieldsPart}/:${constants.internalIdField}_${parentPks.length}?`;
+    // note - internal ID field is mandatory because otherwise we can't distinguish
+    // between an IID and a field name of the entity in the URL
+    // e.g. /models/mod1/{3423-2323...} vs /models/mod1/variants
+    const nextUrlPath = `${urlPath}/${pkFieldsPart}/:${constants.internalIdField}_${parentPks.length}`;
+
+    // add route to single collection element
+    result.push(<Route key={nextUrlPath}
+      path={nextUrlPath} exact={true}
+      component={({ match }) => componentConstructor(
+        match.params, currentSchemaPath, controller, parentPks, pkFields,
+      )}
+    />);
+
     const nextParentPks = parentPks.slice();
     nextParentPks.push(pkFields);
 

@@ -16,6 +16,7 @@ import EditItemTabular from './components/EditItemTabular';
 import EditCollectionTabular from './components/EditCollectionTabular';
 import EditCollection from './components/EditCollection';
 import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
+import EditItemStandalone from './components/EditItemStandalone';
 
 /**
  * @typedef {import('./ItemContainer').default} ItemContainer
@@ -60,6 +61,14 @@ import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
  * @property {Object} itemSchemaDesc- Joi item schema description
  * @property {array} parentIds
  * @property {boolean} rootComponent - indicates if the component is shown as the root UI component or as a child of an item in a collection
+ */
+
+/**
+ * @typedef {Object} StandaloneItemOptions
+ * @property {Controller} controller
+ * @property {string} collectionSchemaPath
+ * @property {array} parentIds
+ * @property {object} ids
  */
 
 class UIFactory {
@@ -179,6 +188,22 @@ class UIFactory {
     }
     return <EditItem key={options.container ? options.container.getKey() : 'empty'}
       container={options.container} controller={options.controller} />;
+  }
+
+  /**
+   * This probably isn't the method you're looking for
+   * It controls how the wrapper around a single item is rendered
+   * When the URL points to a single item, not a collection
+   * @param {StandaloneItemOptions} options
+   */
+  createEditItemStandalone(options) {
+    const {
+      controller, collectionSchemaPath, parentIds, ids,
+    } = options;
+    return <EditItemStandalone controller={controller}
+      collectionSchemaPath={collectionSchemaPath}
+      parentIds={parentIds}
+      ids={ids} />;
   }
 
   /**

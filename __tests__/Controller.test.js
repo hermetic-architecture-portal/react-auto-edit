@@ -357,4 +357,53 @@ describe('Controller', () => {
       expect(parentContainer).toBeTruthy();
     });
   });
+  describe('loadSearchResult', () => {
+    it('loads the children of a parent item when parent is not loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchCollectionSummary = jest.fn();
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        items: [{ modelId: 'telstar' }],
+        totalPages: 2,
+      });
+      const controller = new Controller(schema, apiProxy);
+      await controller.loadSearchResult('makes.[].models', [{ makeId: 'ford' }], 2, '');
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledWith('makes.[].models',
+        [{ makeId: 'ford' }], 2, '');
+      const searchResult = controller.getSearchResult('makes.[].models', [{ makeId: 'ford' }]);
+      expect(searchResult.totalPages).toBe(2);
+      expect(searchResult.containers).toHaveLength(1);
+      expect(searchResult.containers[0].item).toMatchObject({ modelId: 'telstar' });
+    });
+    it('loads the children of a parent item when parent is loaded and not new', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchCollectionSummary = jest.fn();
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        items: [{ modelId: 'telstar' }],
+        totalPages: 2,
+      });
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes', [], [{ makeId: 'ford' }],
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      await controller.loadSearchResult('makes.[].models', [{ makeId: 'ford' }], 2, '');
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledWith('makes.[].models',
+        [{ makeId: 'ford' }], 2, '');
+      const searchResult = controller.getSearchResult('makes.[].models', [{ makeId: 'ford' }]);
+      expect(searchResult.totalPages).toBe(2);
+      expect(searchResult.containers).toHaveLength(1);
+      expect(searchResult.containers[0].item).toMatchObject({ modelId: 'telstar' });
+    });
+    it('does not load the children of a parent item when parent is new', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchCollectionSummary = jest.fn();
+      const controller = new Controller(schema, apiProxy);
+      const parentContainer = controller.addContainer('makes', []);
+      await controller.loadSearchResult('makes.[].models', [parentContainer.getIds()], 2, '');
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledTimes(0);
+      const searchResult = controller.getSearchResult('makes.[].models', [{ makeId: 'ford' }]);
+      expect(searchResult.totalPages).toBe(1);
+      expect(searchResult.containers).toHaveLength(0);
+    });
+  });
 });

@@ -170,6 +170,7 @@ class ItemContainer {
   }
 
   delete() {
+    this.metadata.errors.clear();
     this.setDirty(ItemContainer.changeTypes.delete);
   }
 

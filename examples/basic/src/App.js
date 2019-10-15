@@ -19,9 +19,10 @@ const schema = Joi.object({
   }),
   posts: Joi.array().items({
     id: Joi.number().integer().pk(),
-    userId: Joi.number().integer(),
+    userId: Joi.number().integer().description('thing'),
     title: Joi.string().meta({ displayName: true }),
     body: Joi.string().max(5000),
+    image: Joi.string().meta({ image: true }),
   }),
   comments: Joi.array().items({
     id: Joi.number().integer().pk(),

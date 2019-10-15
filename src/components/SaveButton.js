@@ -8,7 +8,7 @@ import { GlobalHotKeys } from 'react-hotkeys';
  * @param {Controller} props.controller
  */
 const SaveButton = ({ controller }) => {
-  let className = 'Ed-button';
+  let className = 'Ed-button Ed-button-save';
   if (!controller.isDirty()) {
     className = `${className} disabled`;
   }

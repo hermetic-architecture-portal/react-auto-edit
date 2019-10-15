@@ -1,6 +1,6 @@
 {
   "name": "react-auto-edit",
-  "version": "2.2.9",
+  "version": "2.2.11",
   "description": "",
   "main": "lib/index.js",
   "types": "types",

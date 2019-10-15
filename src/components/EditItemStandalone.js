@@ -21,10 +21,7 @@ class EditItemStandalone extends React.Component {
     const {
       controller, collectionSchemaPath, parentIds, ids,
     } = this.props;
-    const container = controller.findContainer(collectionSchemaPath, parentIds, ids);
-    if (container) {
-      controller.loadDetail(container);
-    }
+    controller.loadDetailByIds(collectionSchemaPath, parentIds, ids);
   }
 
   render() {
@@ -35,11 +32,18 @@ class EditItemStandalone extends React.Component {
     if (!container) {
       return <div></div>;
     }
-    return controller.uiFactory.createEditItem({
+    const editItem = controller.uiFactory.createEditItem({
       wantTabularEditor: false,
       container,
       controller,
     });
+    return <div className="Ed-single-col-wrapper Ed-standalone-item-wrapper">
+      <div className="Ed-button Ed-button-delete"
+        onClick={() => controller.deleteContainer(container)}>
+        Delete
+      </div>
+      {editItem}
+    </div>;
   }
 }
 

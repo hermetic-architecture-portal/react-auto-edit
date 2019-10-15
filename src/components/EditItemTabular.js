@@ -64,7 +64,7 @@ class EditItemTabular extends React.Component {
     return <React.Fragment>
       {fields}
       <td>
-        <div className="Ed-button"
+        <div className="Ed-button Ed-button-delete"
           onClick={() => controller.deleteContainer(container)}
         >Delete</div>
       </td>

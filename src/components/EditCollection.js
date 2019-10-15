@@ -2,8 +2,6 @@ import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
 import { HotKeys } from 'react-hotkeys';
 import EditCollectionAbstract from './EditCollectionAbstract';
-import utils from '../utils';
-import ItemContainer from '../ItemContainer';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -62,7 +60,7 @@ class EditCollection extends EditCollectionAbstract {
           </a>
         </div>
         <div className="Ed-column-button">
-          <div className="Ed-button"
+          <div className="Ed-button Ed-button-delete"
             onClick={() => controller.deleteContainer(c)}>
             Delete
           </div>

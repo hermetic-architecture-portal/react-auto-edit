@@ -154,11 +154,11 @@ class EditCollectionAbstract extends React.Component {
   renderNavControls(searchResult) {
     const pageControls = [];
     pageControls.push(<div key="totalpages">{`Page ${this.status.page}/${searchResult.totalPages}`}</div>);
-    const prevPageClassName = this.canGoPrev() ? 'Ed-button' : 'Ed-button disabled';
+    const prevPageClassName = `Ed-button Ed-button-prev ${this.canGoPrev() ? '' : 'disabled'}`;
     pageControls.push(<div key="prev" className={prevPageClassName} onClick={this.prev}>
       &lt;
     </div>);
-    const nextPageClassName = this.canGoNext() ? 'Ed-button' : 'Ed-button disabled';
+    const nextPageClassName = `Ed-button Ed-button-next ${this.canGoNext() ? '' : 'disabled'}`;
     pageControls.push(<div key="next" className={nextPageClassName} onClick={this.next}>
       &gt;
     </div>);
@@ -169,7 +169,7 @@ class EditCollectionAbstract extends React.Component {
           onChange={this.filterChanged}/>
       </div>
       {pageControls}
-      <div className="Ed-button"
+      <div className="Ed-button Ed-button-new"
         onClick={this.addItem}>
         Add <span className="Ed-shortcut-char">i</span>tem
       </div>

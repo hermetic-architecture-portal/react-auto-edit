@@ -406,4 +406,32 @@ describe('Controller', () => {
       expect(searchResult.containers).toHaveLength(0);
     });
   });
+  describe('loadDetailById', () => {
+    it('loads the detail when not already loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      apiProxy.fetchJson.mockReturnValue({ modelId: 'capri', name: 'Capri' });
+      const controller = new Controller(schema, apiProxy);
+      await controller.loadDetailByIds('makes.[].models',
+        [{ makeId: 'ford' }], { modelId: 'capri' });
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/makes/ford/models/capri');
+      const container = controller.itemStore.findContainer('makes.[].models',
+        [{ makeId: 'ford' }], { modelId: 'capri' }, ItemContainer.detailLevel.detail);
+      expect(container).toBeTruthy();
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+    });
+    it('does not load the detail when already loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      apiProxy.fetchJson.mockReturnValue({ modelId: 'capri', name: 'Capri' });
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes.[].models',
+        [{ makeId: 'ford' }], [{ modelId: 'capri' }],
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      await controller.loadDetailByIds('makes.[].models',
+        [{ makeId: 'ford' }], { modelId: 'capri' });
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(0);
+    });
+  });
 });

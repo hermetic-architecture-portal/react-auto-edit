@@ -1,6 +1,6 @@
 import VanillaJoi from 'joi';
 import { pkExtension, fkExtension } from 'joi-key-extensions';
-import { Controller, ApiProxy, ItemContainer } from '../src/index';
+import { Controller, ApiProxy, ItemContainer, utils } from '../src/index';
 
 const Joi = VanillaJoi
   .extend(pkExtension.string)
@@ -432,6 +432,104 @@ describe('Controller', () => {
       await controller.loadDetailByIds('makes.[].models',
         [{ makeId: 'ford' }], { modelId: 'capri' });
       expect(apiProxy.fetchJson).toHaveBeenCalledTimes(0);
+    });
+  });
+  describe('loadSearchResult', () => {
+    it('does not lose changes when navigating between pages', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost', {
+        collectionSummariesIncludesFullEntities: true,
+      });
+      apiProxy.fetchCollectionSummary = jest.fn();
+      const controller = new Controller(schema, apiProxy);
+
+      // load first page of summary
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        totalPages: 2,
+        items: [
+          { makeId: 'ford', name: 'Ford' },
+        ],
+      });
+      await controller.loadSearchResult('makes', [], 1, '');
+      let container = controller.getSearchResult('makes', []).containers[0];
+      expect(container).toBeTruthy();
+      expect(container.item).toMatchObject({ makeId: 'ford', name: 'Ford' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.summary);
+
+      // load detail
+      await controller.loadDetail(container);
+      expect(container.item).toMatchObject({ makeId: 'ford', name: 'Ford' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+
+      // make changes
+      container.setItemFieldValue('name', 'zzzz');
+
+      // load another page
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        totalPages: 2,
+        items: [
+          { makeId: 'toyota', name: 'Toyota' },
+        ],
+      });
+      await controller.loadSearchResult('makes', [], 2, '');
+      // eslint-disable-next-line prefer-destructuring
+      container = controller.getSearchResult('makes', []).containers[0];
+      await controller.loadDetail(container);
+      expect(container.item).toMatchObject({ makeId: 'toyota', name: 'Toyota' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+
+      // load first page again
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        totalPages: 2,
+        items: [
+          { makeId: 'ford', name: 'Ford' },
+        ],
+      });
+      await controller.loadSearchResult('makes', [], 1, '');
+      // eslint-disable-next-line prefer-destructuring
+      container = controller.getSearchResult('makes', []).containers[0];
+
+      // load detail
+      await controller.loadDetail(container);
+      expect(container.item).toMatchObject({ makeId: 'ford', name: 'zzzz' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+    });
+  });
+  describe('constructParentUrl', () => {
+    it('returns the collection from an element of a base collection', () => {
+      const controller = new Controller(schema, null, {
+        baseClientPath: 'http://localhost:9001/test',
+      });
+      const container = new ItemContainer('makes',
+        [],
+        schema, null,
+        { makeId: 'mg' },
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const result = controller.constructParentUrl(container);
+      expect(result).toEqual('http://localhost:9001/test/makes');
+    });
+    it('returns the parent collection of an element', () => {
+      const controller = new Controller(schema, null, {
+        baseClientPath: 'http://localhost:9001/test',
+      });
+      const container = new ItemContainer('makes.[].models',
+        [{ makeId: 'mg' }],
+        schema, null,
+        { modelId: 'bgt' },
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const result = controller.constructParentUrl(container);
+      expect(result).toEqual('http://localhost:9001/test/makes/mg/models');
+    });
+    it('returns the parent collection of an element with grandparents', () => {
+      const controller = new Controller(schema, null, {
+        baseClientPath: 'http://localhost:9001/test',
+      });
+      const container = new ItemContainer('makes.[].models.[].variants',
+        [{ makeId: 'mg' }, { modelId: 'bgt' }],
+        schema, null,
+        { variantId: 'mk1' },
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const result = controller.constructParentUrl(container);
+      expect(result).toEqual('http://localhost:9001/test/makes/mg/models/bgt/variants');
     });
   });
 });

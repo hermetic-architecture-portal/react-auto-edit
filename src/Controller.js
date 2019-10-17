@@ -124,6 +124,32 @@ class Controller {
 
   /**
    * @param {ItemContainer} container
+   */
+  constructParentUrl(container) {
+    const schemaPathChunks = container.metadata.collectionSchemaPath
+      .split('.')
+      .filter(chunk => !!chunk);
+    if (schemaPathChunks.length === 1) {
+      return `${this.baseClientPath}/${schemaPathChunks[0]}`;
+    }
+    const parentsParentIds = container.metadata.parentIds
+      .filter((item, index) => index < (container.metadata.parentIds.length - 1));
+    const parentsIds = container.metadata.parentIds.length
+      ? container.metadata.parentIds[container.metadata.parentIds.length - 1]
+      : {};
+    const parentFieldName = schemaPathChunks[schemaPathChunks.length - 1];
+    const parentSchemaPath = schemaPathChunks
+      .filter((item, index) => index < (schemaPathChunks.length - 2))
+      .join('.');
+    const parentContainer = new ItemContainer(parentSchemaPath,
+      parentsParentIds, this.schema,
+      utils.reach(this.schema, `${parentSchemaPath}.[]`).describe(),
+      parentsIds);
+    return this.constructLinkUrl(parentContainer, parentFieldName);
+  }
+
+  /**
+   * @param {ItemContainer} container
    * @param {string} fieldName
    */
   constructLinkUrl(container, fieldName) {
@@ -170,7 +196,9 @@ class Controller {
       currentSchemaPath = currentSchemaPath ? `${currentSchemaPath}.${pathChunk}`
         : pathChunk;
     });
-    urlParts.push(fieldName);
+    if (fieldName) {
+      urlParts.push(fieldName);
+    }
     return `${this.baseClientPath}/${urlParts.join('/')}`;
   }
 

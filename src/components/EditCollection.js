@@ -1,5 +1,6 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
+import { withRouter } from 'react-router-dom';
 import { HotKeys } from 'react-hotkeys';
 import EditCollectionAbstract from './EditCollectionAbstract';
 
@@ -54,10 +55,16 @@ class EditCollection extends EditCollectionAbstract {
         key={c.getKey()}
         className="Ed-row" >
         <div className="Ed-column">
-          <a className={className} onClick={event => this.linkClicked(event, c.item)}
+          <div className={className} onClick={event => this.linkClicked(event, c.item)}
             href={`#${c.getKey()}`} >
             {c.getDisplayName()}
-          </a>
+          </div>
+        </div>
+        <div className="Ed-column-button">
+          <div className="Ed-button Ed-button-full-page-edit"
+            onClick={() => this.edit(c)}>
+            Edit
+          </div>
         </div>
         <div className="Ed-column-button">
           <div className="Ed-button Ed-button-delete"
@@ -90,4 +97,4 @@ class EditCollection extends EditCollectionAbstract {
 }
 
 
-export default observer(EditCollection);
+export default withRouter(observer(EditCollection));

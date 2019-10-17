@@ -1,4 +1,5 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
+import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 /**
@@ -15,6 +16,11 @@ import { observer } from 'mobx-react';
 class EditItemStandalone extends React.Component {
   componentDidMount() {
     this.load();
+    this.delete = this.delete.bind(this);
+  }
+
+  getUrl() {
+    return window.location.href;
   }
 
   load() {
@@ -24,10 +30,29 @@ class EditItemStandalone extends React.Component {
     controller.loadDetailByIds(collectionSchemaPath, parentIds, ids);
   }
 
+  delete(container) {
+    const {
+      controller, history,
+    } = this.props;
+    let parentUrl;
+    const currentUrl = new window.URL(this.getUrl());
+    if (currentUrl.searchParams.has('return')) {
+      // we got here by clicking an in app link, so can go back where we were
+      parentUrl = atob(currentUrl.searchParams.get('return'));
+    } else {
+      // we entered the app directly at this entity, so have to construct
+      // a path to the parent element
+      parentUrl = controller.constructParentUrl(container);
+    }
+    controller.deleteContainer(container);
+    history.replace(parentUrl);
+  }
+
   render() {
     const {
       controller, collectionSchemaPath, parentIds, ids,
     } = this.props;
+
     const container = controller.findContainer(collectionSchemaPath, parentIds, ids);
     if (!container) {
       return <div></div>;
@@ -39,7 +64,7 @@ class EditItemStandalone extends React.Component {
     });
     return <div className="Ed-single-col-wrapper Ed-standalone-item-wrapper">
       <div className="Ed-button Ed-button-delete"
-        onClick={() => controller.deleteContainer(container)}>
+        onClick={() => this.delete(container)}>
         Delete
       </div>
       {editItem}
@@ -47,4 +72,4 @@ class EditItemStandalone extends React.Component {
   }
 }
 
-export default observer(EditItemStandalone);
+export default withRouter(observer(EditItemStandalone));

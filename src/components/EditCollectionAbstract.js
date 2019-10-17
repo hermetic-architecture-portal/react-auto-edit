@@ -133,6 +133,13 @@ class EditCollectionAbstract extends React.Component {
     }
   }
 
+  edit(container) {
+    const nextUrl = this.props.controller.constructLinkUrl(container);
+    const currentUrl = new window.URL(this.getUrl());
+    const returnToken = btoa(`${currentUrl.pathname}${currentUrl.search}`);
+    this.props.history.push(`${nextUrl}?return=${returnToken}`);
+  }
+
   canGoNext() {
     return this.status.page < this.getSearchResult().totalPages;
   }

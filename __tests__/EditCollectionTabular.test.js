@@ -45,5 +45,15 @@ describe('EditCollectionTabular', () => {
         EditCollectionTabular.canShowCollection(schema, 'items'),
       ).toBe(true);
     });
+    it('returns false if there is an image field', () => {
+      const schema = Joi.object({
+        items: Joi.array().items({
+          img: Joi.string().meta({ image: true }),
+        }),
+      });
+      expect(
+        EditCollectionTabular.canShowCollection(schema, 'items'),
+      ).toBe(false);
+    });
   });
 });

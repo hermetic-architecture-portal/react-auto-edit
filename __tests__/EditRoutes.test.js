@@ -47,7 +47,7 @@ describe('EditRoutes', () => {
     expect(example.childAt(0).prop('controller')).toBe(controller);
   });
   it('produces a route to an entity in the root collection', () => {
-    const route = findRouteByPath(routes, '/makes/:makeId/:__iid_0?');
+    const route = findRouteByPath(routes, '/makes/:makeId/:__iid_0');
     expect(route).toHaveLength(1);
     const example = shallow(route.prop('component')({
       match: {
@@ -67,7 +67,7 @@ describe('EditRoutes', () => {
     expect(example.childAt(0).prop('controller')).toBe(controller);
   });
   it('produces a route to a child collection', () => {
-    const route = findRouteByPath(routes, '/makes/:makeId/:__iid_0?/models');
+    const route = findRouteByPath(routes, '/makes/:makeId/:__iid_0/models');
     expect(route).toHaveLength(1);
     const example = shallow(route.prop('component')({
       match: {
@@ -86,7 +86,7 @@ describe('EditRoutes', () => {
     expect(example.childAt(0).prop('controller')).toBe(controller);
   });
   it('produces a route to an entity in the child collection', () => {
-    const route = findRouteByPath(routes, '/makes/:makeId/:__iid_0?/models/:modelId/:__iid_1?');
+    const route = findRouteByPath(routes, '/makes/:makeId/:__iid_0/models/:modelId/:__iid_1');
     expect(route).toHaveLength(1);
     const example = shallow(route.prop('component')({
       match: {
@@ -113,7 +113,7 @@ describe('EditRoutes', () => {
   });
   it('produces a route to a grandchild collection', () => {
     const route = findRouteByPath(routes,
-      '/makes/:makeId/:__iid_0?/models/:modelId/:__iid_1?/variants');
+      '/makes/:makeId/:__iid_0/models/:modelId/:__iid_1/variants');
     expect(route).toHaveLength(1);
     const example = shallow(route.prop('component')({
       match: {
@@ -135,7 +135,7 @@ describe('EditRoutes', () => {
   });
   it('produces a route to an entity in the  grandchild collection', () => {
     const route = findRouteByPath(routes,
-      '/makes/:makeId/:__iid_0?/models/:modelId/:__iid_1?/variants/:variantId/:__iid_2?');
+      '/makes/:makeId/:__iid_0/models/:modelId/:__iid_1/variants/:variantId/:__iid_2');
     expect(route).toHaveLength(1);
     const example = shallow(route.prop('component')({
       match: {

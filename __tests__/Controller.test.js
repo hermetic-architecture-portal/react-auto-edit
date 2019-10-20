@@ -207,7 +207,7 @@ describe('Controller', () => {
         ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
       const container = controller.itemStore.findContainer('makes', [], { makeId: 'ford' });
       const result = controller.constructLinkUrl(container, 'models');
-      expect(result).toBe('/makes/ford/models');
+      expect(result).toBe(`/makes/ford/${container.item.__iid}/models`);
     });
     it('makes a good URL when parent is a new item', () => {
       const controller = new Controller(schema);
@@ -232,7 +232,7 @@ describe('Controller', () => {
       const child = controller.itemStore.findContainer('makes.[].models', [{ makeId: 'suzuki' }],
         { modelId: 'swift' });
       const result = controller.constructLinkUrl(child, 'variants');
-      expect(result).toBe('/makes/suzuki/models/swift/variants');
+      expect(result).toBe(`/makes/suzuki/undefined/models/swift/${child.item.__iid}/variants`);
     });
   });
   describe('loadDetail', () => {
@@ -517,7 +517,7 @@ describe('Controller', () => {
         { modelId: 'bgt' },
         ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
       const result = controller.constructParentUrl(container);
-      expect(result).toEqual('http://localhost:9001/test/makes/mg/models');
+      expect(result).toEqual(`http://localhost:9001/test/makes/mg/undefined/models`);
     });
     it('returns the parent collection of an element with grandparents', () => {
       const controller = new Controller(schema, null, {
@@ -529,7 +529,8 @@ describe('Controller', () => {
         { variantId: 'mk1' },
         ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
       const result = controller.constructParentUrl(container);
-      expect(result).toEqual('http://localhost:9001/test/makes/mg/models/bgt/variants');
+      expect(result)
+        .toEqual('http://localhost:9001/test/makes/mg/undefined/models/bgt/undefined/variants');
     });
   });
 });

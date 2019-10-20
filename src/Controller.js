@@ -1,5 +1,4 @@
 import { observable } from 'mobx';
-import clone from 'clone-deep';
 import utils from './utils';
 import ItemStore from './ItemStore';
 import ItemContainer from './ItemContainer';
@@ -145,6 +144,7 @@ class Controller {
       parentsParentIds, this.schema,
       utils.reach(this.schema, `${parentSchemaPath}.[]`).describe(),
       parentsIds);
+    parentContainer.item[constants.internalIdField] = undefined;
     return this.constructLinkUrl(parentContainer, parentFieldName);
   }
 
@@ -163,10 +163,8 @@ class Controller {
     schemaPathChunks.forEach((pathChunk, index) => {
       if (pathChunk === '[]') {
         let ids;
-        let isNew = false;
         if (index === schemaPathChunks.length - 1) {
           ids = container.getIds();
-          isNew = container.isNewItem();
         } else {
           const parentContainer = this.itemStore.findContainer(
             currentSchemaPath,
@@ -176,7 +174,6 @@ class Controller {
           );
           if (parentContainer) {
             ids = parentContainer.getIds();
-            isNew = parentContainer.isNewItem();
           } else {
             ids = container.metadata.parentIds[parentIdsIndex];
           }
@@ -186,9 +183,7 @@ class Controller {
         const primaryKeyFields = utils.getPrimaryKeyFieldNames(currentSchemaDesc);
         const keyValues = primaryKeyFields
           .map(pk => encodeURIComponent(ids[pk]));
-        if (isNew) {
-          keyValues.push(encodeURIComponent(ids[constants.internalIdField]));
-        }
+        keyValues.push(encodeURIComponent(ids[constants.internalIdField]));
         urlParts.push(...keyValues);
       } else {
         urlParts.push(pathChunk);

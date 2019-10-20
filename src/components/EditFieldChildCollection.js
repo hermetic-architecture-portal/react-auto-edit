@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react';
 // eslint-disable-next-line import/no-cycle
 import EditCollectionTabular from './EditCollectionTabular';
-import utils from '../utils';
 
 /**
  * @typedef {import('../ItemContainer').default} ItemContainer

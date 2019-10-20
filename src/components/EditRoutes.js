@@ -91,7 +91,10 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     const pkFieldsPart = pkFields
       .map(pk => `:${pk.fieldName}`)
       .join('/');
-    const nextUrlPath = `${urlPath}/${pkFieldsPart}/:${constants.internalIdField}_${parentPks.length}?`;
+    // note - internal ID field is mandatory because otherwise we can't distinguish
+    // between an IID and a field name of the entity in the URL
+    // e.g. /models/mod1/{3423-2323...} vs /models/mod1/variants
+    const nextUrlPath = `${urlPath}/${pkFieldsPart}/:${constants.internalIdField}_${parentPks.length}`;
 
     // add route to single collection element
     result.push(<Route key={nextUrlPath}

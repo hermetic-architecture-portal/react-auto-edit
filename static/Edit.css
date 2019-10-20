@@ -223,9 +223,20 @@ input[type="file"] {
   height: 70px;
 }
 
-.Ed-tabular-collection textarea {
+.Ed-two-col-wrapper .Ed-tabular-collection textarea 
+{
   resize: none;
   height: 1em;
+  width: 230px;
+  box-sizing: content-box;
+}
+
+.Ed-tabular-collection textarea
+{
+  resize: none;
+  height: 1em;
+  width: 230px;
+  box-sizing: content-box;
 }
 
 .Ed-tabular-collection textarea:focus {
@@ -431,6 +442,8 @@ input[type="file"] {
   color: black;
   text-decoration: none;
   cursor: pointer;
+  padding-top: 1px;
+  padding-bottom: 2px;
 }
 
 .Ed-container-link:hover {
@@ -439,9 +452,9 @@ input[type="file"] {
 
 .Ed-collection-error-item {
   background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9InJlZCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItYWxlcnQtdHJpYW5nbGUiPjxwYXRoIGQ9Ik0xMC4yOSAzLjg2TDEuODIgMThhMiAyIDAgMCAwIDEuNzEgM2gxNi45NGEyIDIgMCAwIDAgMS43MS0zTDEzLjcxIDMuODZhMiAyIDAgMCAwLTMuNDIgMHoiPjwvcGF0aD48bGluZSB4MT0iMTIiIHkxPSI5IiB4Mj0iMTIiIHkyPSIxMyI+PC9saW5lPjxsaW5lIHgxPSIxMiIgeTE9IjE3IiB4Mj0iMTIiIHkyPSIxNyI+PC9saW5lPjwvc3ZnPg==");
-  background-size: 18px 18px;
+  background-size: 16px 16px;
   background-repeat: no-repeat;
-  background-position: right;
+  background-position: right 3px top 1px;
 }
 
 .Ed-shortcut-char {

@@ -39,11 +39,13 @@ const EditFieldGroup = ({
       {utils.getFieldDisplayName(fieldName, fieldSchemaDesc)}
       {description}
     </div>
-    <EditField controller={controller}
-      container={container}
-      fieldName={fieldName} key={fieldName} />
-    {required}
-    {errorBlock}
+    <div className="Ed-field-value">
+      <EditField controller={controller}
+        container={container}
+        fieldName={fieldName} key={fieldName} />
+      {required}
+      {errorBlock}
+    </div>
   </div>;
 };
 

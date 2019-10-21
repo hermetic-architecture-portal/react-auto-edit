@@ -57,6 +57,11 @@
   padding: 2px;
 }
 
+.Ed-field-value {
+  display: inline-block;
+  min-width: 200px;
+}
+
 .Ed-field-name {
   display: inline-block;
   width: 200px;
@@ -69,7 +74,6 @@
 
 .Ed-column-button {
   flex: none;
-  /* width: 70px; */
 }
 
 .Ed-column-button .Ed-button {

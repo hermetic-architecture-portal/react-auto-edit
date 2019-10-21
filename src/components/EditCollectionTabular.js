@@ -60,6 +60,7 @@ class EditCollectionTabular extends EditCollectionAbstract {
             <ReactTooltip />
           </th>;
         });
+
     const items = searchResult.containers.map(container => <tr
         key={container.getKey()}>
         {controller.uiFactory.createEditItem({

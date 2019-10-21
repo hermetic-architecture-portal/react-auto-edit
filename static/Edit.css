@@ -28,6 +28,16 @@
 .Ed-child-collection-container {
   display: inline-block;
   margin: -4px;
+  max-width: 100%;
+}
+
+.Ed-tabular-collection {
+  overflow-x: auto;
+  display: block;
+}
+
+.Ed-tabular-collection td {
+  white-space: nowrap;
 }
 
 .Ed-row {

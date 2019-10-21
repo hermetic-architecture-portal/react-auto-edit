@@ -61,6 +61,7 @@ class EditFieldFk extends React.Component {
     const fkMetadata = container.getForeignKeyMetadata(fieldName);
 
     const lookupData = controller.getLookupData(container, fieldName);
+    console.log(fieldName, lookupData.length);
     let lookupValue = controller.getLookupItemContainer(container, fieldName);
 
     if (!lookupValue) {

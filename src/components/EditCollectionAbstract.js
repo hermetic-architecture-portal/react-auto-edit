@@ -19,6 +19,7 @@ class EditCollectionAbstract extends React.Component {
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
     this.addItem = this.addItem.bind(this);
+    this.addItemFullPage = this.addItemFullPage.bind(this);
   }
 
   getUrl() {
@@ -158,6 +159,12 @@ class EditCollectionAbstract extends React.Component {
     this.setCurrentItem(newContainer.item);
   }
 
+  addItemFullPage() {
+    const { controller, schemaPath, parentIds } = this.props;
+    const newContainer = controller.addContainer(schemaPath, parentIds);
+    this.edit(newContainer);
+  }
+
   renderNavControls(searchResult) {
     const pageControls = [];
     pageControls.push(<div key="totalpages">{`Page ${this.status.page}/${searchResult.totalPages}`}</div>);
@@ -175,10 +182,16 @@ class EditCollectionAbstract extends React.Component {
           value={this.status.filter}
           onChange={this.filterChanged}/>
       </div>
-      {pageControls}
-      <div className="Ed-button Ed-button-new"
-        onClick={this.addItem}>
-        Add <span className="Ed-shortcut-char">i</span>tem
+      <div>
+        {pageControls}
+        <div className="Ed-button Ed-button-new"
+          onClick={this.addItem}>
+          Add <span className="Ed-shortcut-char">i</span>tem
+        </div>
+        <div className="Ed-button Ed-button-new-full-page"
+          onClick={this.addItemFullPage}>
+          Add in new screen
+        </div>
       </div>
     </div>;
   }

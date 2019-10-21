@@ -129,6 +129,11 @@
   float: right;
 }
 
+.Ed-button-new-full-page {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItZmlsZS1wbHVzIj48cGF0aCBkPSJNMTQgMkg2YTIgMiAwIDAgMC0yIDJ2MTZhMiAyIDAgMCAwIDIgMmgxMmEyIDIgMCAwIDAgMi0yVjh6Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iMTQgMiAxNCA4IDIwIDgiPjwvcG9seWxpbmU+PGxpbmUgeDE9IjEyIiB5MT0iMTgiIHgyPSIxMiIgeTI9IjEyIj48L2xpbmU+PGxpbmUgeDE9IjkiIHkxPSIxNSIgeDI9IjE1IiB5Mj0iMTUiPjwvbGluZT48L3N2Zz4=");
+  float: right;
+}
+
 .Ed-button-save {
   background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJmZWF0aGVyIGZlYXRoZXItc2F2ZSI+PHBhdGggZD0iTTE5IDIxSDVhMiAyIDAgMCAxLTItMlY1YTIgMiAwIDAgMSAyLTJoMTFsNSA1djExYTIgMiAwIDAgMS0yIDJ6Ij48L3BhdGg+PHBvbHlsaW5lIHBvaW50cz0iMTcgMjEgMTcgMTMgNyAxMyA3IDIxIj48L3BvbHlsaW5lPjxwb2x5bGluZSBwb2ludHM9IjcgMyA3IDggMTUgOCI+PC9wb2x5bGluZT48L3N2Zz4=");
 }
@@ -280,6 +285,7 @@ input[type="file"] {
   background-color: lightgray;
   padding: 4px;
   font-family: sans-serif;
+  clear: both;
 }
 
 .Ed-content {
@@ -479,7 +485,7 @@ input[type="file"] {
   padding-left: 10px;
 }
 
-.Ed-standalone-item-wrapper .Ed-button {
+.Ed-standalone-item-wrapper .Ed-button:first-child {
   float: right;
 }
 
@@ -510,5 +516,48 @@ input[type="file"] {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+.Ed-collection-tabular .Ed-page-nav-container div.Ed-button-new {
+  display: block;
+}
+.Ed-collection-tabular .Ed-page-nav-container .Ed-button-new-full-page {
+  display: none;
+}
+
+@media only screen and (min-width: 768px) {
+  .Ed-container-link-full-page-edit {
+    display: none;
+  }
+
+  .Ed-page-nav-container .Ed-button-new-full-page {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .Ed-page-nav-container .Ed-button-new-full-page {
+    display: block;
+  }
+
+  .Ed-page-nav-container .Ed-button-new {
+    display: none;
+  }
+
+  .Ed-two-col-wrapper .Ed-right-col {
+    display: none;
+  }
+  .Ed-column-button .Ed-button.Ed-button-full-page-edit {
+    display: none;
+  }
+  /* make this component (which triggers the mobile navigation)
+  cover the non-mobile component (so non-mobile navigation doesn't happen)  */
+  .Ed-container-link-full-page-edit {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    top: -100%;
+    z-index: 999;
   }
 }

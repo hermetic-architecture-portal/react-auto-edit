@@ -58,6 +58,7 @@ class EditCollection extends EditCollectionAbstract {
           <div className={className} onClick={event => this.linkClicked(event, c.item)}
             href={`#${c.getKey()}`} >
             {c.getDisplayName()}
+            <div className="Ed-container-link-full-page-edit" onClick={() => this.edit(c)}></div>
           </div>
         </div>
         <div className="Ed-column-button">
@@ -74,7 +75,7 @@ class EditCollection extends EditCollectionAbstract {
         </div>
       </div>;
     });
-    return <div>
+    return <div className="Ed-collection">
       <HotKeys keyMap={{ INSERT: 'ctrl+i' }}
         handlers={{ INSERT: this.addItem }}>
         <div className="Ed-two-col-wrapper">

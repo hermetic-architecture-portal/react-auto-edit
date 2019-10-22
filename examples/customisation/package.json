@@ -3,7 +3,6 @@
   "version": "2.3.0",
   "private": true,
   "dependencies": {
-    "clone-deep": "^4.0.1",
     "joi": "^14.3.1",
     "joi-key-extensions": "^1.0.9",
     "mobx": "^5.13.0",
@@ -11,7 +10,7 @@
     "react": "^16.9.0",
     "react-auto-edit": "^2.3.0",
     "react-dom": "^16.9.0",
-    "react-router-dom": "^4.3.1",
+    "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1",
     "react-toastify": "^5.4.0"
   },

@@ -32,7 +32,7 @@
 }
 
 .Ed-tabular-collection {
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: visible;
   table-layout: fixed;
   width: 100%;
@@ -504,7 +504,7 @@ input[type="file"] {
   padding-left: 10px;
 }
 
-.Ed-standalone-item-wrapper .Ed-button:first-child {
+.Ed-standalone-item-wrapper > .Ed-button:first-child {
   float: right;
 }
 

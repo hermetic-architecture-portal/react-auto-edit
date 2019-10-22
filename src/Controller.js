@@ -312,17 +312,19 @@ class Controller {
     const itemSchemaDesc = existingContainer ? existingContainer.itemSchemaDesc
       : utils.reach(this.schema, `${collectionSchemaPath}.[]`).describe();
 
+    let data;
+
     if (existingContainer && this.apiProxy
       .collectionSummaryIncludesFullEntities(collectionSchemaPath)) {
       // the API method to get collection summary returns full details so we don't need
       // to call a REST API, just flag the existing container
-      existingContainer.upgradeSummaryToDetail(existingContainer.item);
-      return;
+      data = existingContainer.getCleanItem();
+    } else {
+      data = await this.apiProxy.fetchItemDetail(
+        `${collectionSchemaPath}.[]`,
+        parentIds, ids,
+      );
     }
-    const data = await this.apiProxy.fetchItemDetail(
-      `${collectionSchemaPath}.[]`,
-      parentIds, ids,
-    );
     const fkFieldNames = Object.getOwnPropertyNames(itemSchemaDesc.children)
       .filter(fieldName => utils
         .isFkField(utils

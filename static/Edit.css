@@ -23,6 +23,7 @@
 .Ed-react-select__menu {
   margin-top: 0px !important;
   border-radius: 0px !important;
+  font-size: 12px;
 }
 
 .Ed-child-collection-container {
@@ -32,7 +33,7 @@
 }
 
 .Ed-tabular-collection {
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: visible;
   table-layout: fixed;
   width: 100%;
@@ -504,7 +505,7 @@ input[type="file"] {
   padding-left: 10px;
 }
 
-.Ed-standalone-item-wrapper .Ed-button:first-child {
+.Ed-standalone-item-wrapper > .Ed-button:first-child {
   float: right;
 }
 

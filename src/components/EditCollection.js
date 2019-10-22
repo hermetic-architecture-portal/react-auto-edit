@@ -1,6 +1,5 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
-import { withRouter } from 'react-router-dom';
 import { HotKeys } from 'react-hotkeys';
 import EditCollectionAbstract from './EditCollectionAbstract';
 
@@ -98,4 +97,4 @@ class EditCollection extends EditCollectionAbstract {
 }
 
 
-export default withRouter(observer(EditCollection));
+export default observer(EditCollection);

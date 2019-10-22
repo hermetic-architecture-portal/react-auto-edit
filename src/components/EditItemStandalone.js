@@ -1,5 +1,4 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
-import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
 /**
@@ -72,4 +71,4 @@ class EditItemStandalone extends React.Component {
   }
 }
 
-export default withRouter(observer(EditItemStandalone));
+export default observer(EditItemStandalone);

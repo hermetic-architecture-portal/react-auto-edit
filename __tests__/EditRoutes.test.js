@@ -41,7 +41,7 @@ describe('EditRoutes', () => {
         params: {},
       },
     }));
-    expect(example.childAt(0).name()).toBe('withRouter(EditCollection)');
+    expect(example.childAt(0).name()).toBe('EditCollection');
     expect(example.childAt(0).prop('schemaPath')).toBe('makes');
     expect(example.childAt(0).prop('parentIds')).toEqual([]);
     expect(example.childAt(0).prop('controller')).toBe(controller);
@@ -57,7 +57,7 @@ describe('EditRoutes', () => {
         },
       },
     }));
-    expect(example.childAt(0).name()).toBe('withRouter(EditItemStandalone)');
+    expect(example.childAt(0).name()).toBe('EditItemStandalone');
     expect(example.childAt(0).prop('collectionSchemaPath')).toBe('makes');
     expect(example.childAt(0).prop('parentIds')).toEqual([]);
     expect(example.childAt(0).prop('ids')).toEqual({
@@ -77,7 +77,7 @@ describe('EditRoutes', () => {
         },
       },
     }));
-    expect(example.childAt(0).name()).toBe('withRouter(EditCollection)');
+    expect(example.childAt(0).name()).toBe('EditCollection');
     expect(example.childAt(0).prop('schemaPath')).toBe('makes.[].models');
     expect(example.childAt(0).prop('parentIds')).toEqual([{
       makeId: 'a',
@@ -98,7 +98,7 @@ describe('EditRoutes', () => {
         },
       },
     }));
-    expect(example.childAt(0).name()).toBe('withRouter(EditItemStandalone)');
+    expect(example.childAt(0).name()).toBe('EditItemStandalone');
     expect(example.childAt(0).prop('collectionSchemaPath')).toBe('makes.[].models');
     expect(example.childAt(0).prop('parentIds')).toEqual([{
       makeId: 'a',
@@ -125,7 +125,7 @@ describe('EditRoutes', () => {
         },
       },
     }));
-    expect(example.childAt(0).name()).toBe('EditCollectionTabular');
+    expect(example.childAt(0).name()).toBe('EditCollection');
     expect(example.childAt(0).prop('schemaPath')).toBe('makes.[].models.[].variants');
     expect(example.childAt(0).prop('parentIds')).toEqual([
       { makeId: 'a', __iid: 'b' },
@@ -149,7 +149,7 @@ describe('EditRoutes', () => {
         },
       },
     }));
-    expect(example.childAt(0).name()).toBe('withRouter(EditItemStandalone)');
+    expect(example.childAt(0).name()).toBe('EditItemStandalone');
     expect(example.childAt(0).prop('collectionSchemaPath')).toBe('makes.[].models.[].variants');
     expect(example.childAt(0).prop('parentIds')).toEqual([
       { makeId: 'a', __iid: 'b' },

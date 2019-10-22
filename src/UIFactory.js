@@ -45,6 +45,12 @@ import EditItemStandalone from './components/EditItemStandalone';
  * @property {boolean} isRequired
  */
 
+/**
+ * @typedef {Object} RouteArgs
+ * @property {Object} history
+ * @property {Object} location
+ * @property {Object} match
+ */
 
 /**
  * @typedef {Object} ItemOptions
@@ -61,6 +67,7 @@ import EditItemStandalone from './components/EditItemStandalone';
  * @property {Object} itemSchemaDesc- Joi item schema description
  * @property {array} parentIds
  * @property {boolean} rootComponent - indicates if the component is shown as the root UI component or as a child of an item in a collection
+ * @property {RouteArgs} routeArgs
  */
 
 /**
@@ -69,6 +76,7 @@ import EditItemStandalone from './components/EditItemStandalone';
  * @property {string} collectionSchemaPath
  * @property {array} parentIds
  * @property {object} ids
+ * @property {RouteArgs} routeArgs
  */
 
 class UIFactory {
@@ -77,7 +85,7 @@ class UIFactory {
    */
   constructor(options) {
     const fullOptions = Object.assign({
-      preferredDisplayMode: UIFactory.displayModes.tabular,
+      preferredDisplayMode: UIFactory.displayModes.masterDetail,
     }, options || {});
     this.options = fullOptions;
   }
@@ -198,12 +206,12 @@ class UIFactory {
    */
   createEditItemStandalone(options) {
     const {
-      controller, collectionSchemaPath, parentIds, ids,
+      controller, collectionSchemaPath, parentIds, ids, routeArgs,
     } = options;
     return <EditItemStandalone controller={controller}
       collectionSchemaPath={collectionSchemaPath}
       parentIds={parentIds}
-      ids={ids} />;
+      ids={ids} history={routeArgs.history} />;
   }
 
   /**
@@ -211,7 +219,7 @@ class UIFactory {
    */
   createEditCollection(options) {
     const {
-      controller, collectionSchemaPath, parentIds, rootComponent,
+      controller, collectionSchemaPath, parentIds, rootComponent, routeArgs,
     } = options;
 
     let mode = UIFactory.displayModes.masterDetail;
@@ -230,6 +238,7 @@ class UIFactory {
       schemaPath={collectionSchemaPath}
       parentIds={parentIds}
       rootComponent={rootComponent}
+      history={routeArgs.history}
       />;
     }
     return <EditCollection
@@ -237,6 +246,7 @@ class UIFactory {
       schemaPath={collectionSchemaPath}
       parentIds={parentIds}
       rootComponent={true}
+      history={routeArgs.history}
       />;
   }
 

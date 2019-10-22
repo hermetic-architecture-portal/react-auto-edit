@@ -11,7 +11,9 @@ const castParam = (value, fieldSchemaDesc) => {
   return value;
 };
 
-const componentConstructor = (params, schemaPath, controller, parentPks, itemPks) => {
+const componentConstructor = (routeArgs, schemaPath, controller, parentPks, itemPks) => {
+  // eslint-disable-next-line prefer-destructuring
+  const params = routeArgs.match.params;
   const parentIds = parentPks.map((parentItemPks, index) => {
     const result = {};
     parentItemPks.forEach((pk) => {
@@ -44,6 +46,7 @@ const componentConstructor = (params, schemaPath, controller, parentPks, itemPks
       collectionSchemaPath: schemaPath,
       parentIds,
       ids,
+      routeArgs,
     });
   } else {
     childElement = controller.uiFactory.createEditCollection({
@@ -51,6 +54,7 @@ const componentConstructor = (params, schemaPath, controller, parentPks, itemPks
       collectionSchemaPath: schemaPath,
       parentIds,
       rootComponent: true,
+      routeArgs,
     });
   }
   return <div className="Ed-content">
@@ -77,8 +81,8 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     // add route to collection
     result.push(<Route key={urlPath}
       path={urlPath} exact={true}
-      component={({ match }) => componentConstructor(
-        match.params, currentSchemaPath, controller, parentPks,
+      component={routeArgs => componentConstructor(
+        routeArgs, currentSchemaPath, controller, parentPks,
       )}
     />);
     const nextSchemaPath = currentSchemaPath ? `${currentSchemaPath}.[]` : '[]';
@@ -99,8 +103,8 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     // add route to single collection element
     result.push(<Route key={nextUrlPath}
       path={nextUrlPath} exact={true}
-      component={({ match }) => componentConstructor(
-        match.params, currentSchemaPath, controller, parentPks, pkFields,
+      component={routeArgs => componentConstructor(
+        routeArgs, currentSchemaPath, controller, parentPks, pkFields,
       )}
     />);
 

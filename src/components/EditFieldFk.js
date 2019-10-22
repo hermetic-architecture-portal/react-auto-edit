@@ -61,7 +61,6 @@ class EditFieldFk extends React.Component {
     const fkMetadata = container.getForeignKeyMetadata(fieldName);
 
     const lookupData = controller.getLookupData(container, fieldName);
-    console.log(fieldName, lookupData.length);
     let lookupValue = controller.getLookupItemContainer(container, fieldName);
 
     if (!lookupValue) {
@@ -74,6 +73,7 @@ class EditFieldFk extends React.Component {
       isClearable={!isRequired}
       isDisabled={readonly}
       onInputChange={this.filterChanged}
+      menuPortalTarget={document.body}
       onMenuOpen={this.menuOpen}
       options={lookupData}
       getOptionLabel={optionContainer => optionContainer.getDisplayName()}

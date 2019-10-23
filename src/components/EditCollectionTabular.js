@@ -4,7 +4,6 @@ import ReactTooltip from 'react-tooltip';
 import { HotKeys } from 'react-hotkeys';
 import utils from '../utils';
 // eslint-disable-next-line import/no-cycle
-import constants from '../constants';
 import EditCollectionAbstract from './EditCollectionAbstract';
 
 /**
@@ -24,11 +23,8 @@ class EditCollectionTabular extends EditCollectionAbstract {
       if (fieldSchemaDesc.type === 'array') {
         return false;
       }
-      if (fieldSchemaDesc.type === 'string') {
-        const max = utils.findRuleArg(fieldSchemaDesc, 'max');
-        if (max && max >= constants.bigStringSize) {
-          return false;
-        }
+      if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.some(m => m.image)) {
+        return false;
       }
     }
     return true;
@@ -64,6 +60,7 @@ class EditCollectionTabular extends EditCollectionAbstract {
             <ReactTooltip />
           </th>;
         });
+
     const items = searchResult.containers.map(container => <tr
         key={container.getKey()}>
         {controller.uiFactory.createEditItem({
@@ -73,7 +70,7 @@ class EditCollectionTabular extends EditCollectionAbstract {
           wantTabularEditor: true,
         })}
     </tr>);
-    return <div className="Ed-single-col-wrapper">
+    return <div className="Ed-single-col-wrapper Ed-collection-tabular">
       <HotKeys keyMap={{ INSERT: 'ctrl+i' }}
         handlers={{ INSERT: this.addItem }}>
         {this.renderNavControls(searchResult)}

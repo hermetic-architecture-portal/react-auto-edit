@@ -1,6 +1,6 @@
 import VanillaJoi from 'joi';
 import { pkExtension, fkExtension } from 'joi-key-extensions';
-import { Controller, ApiProxy, ItemContainer } from '../src/index';
+import { Controller, ApiProxy, ItemContainer, utils } from '../src/index';
 
 const Joi = VanillaJoi
   .extend(pkExtension.string)
@@ -207,7 +207,7 @@ describe('Controller', () => {
         ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
       const container = controller.itemStore.findContainer('makes', [], { makeId: 'ford' });
       const result = controller.constructLinkUrl(container, 'models');
-      expect(result).toBe('/makes/ford/models');
+      expect(result).toBe(`/makes/ford/${container.item.__iid}/models`);
     });
     it('makes a good URL when parent is a new item', () => {
       const controller = new Controller(schema);
@@ -232,7 +232,7 @@ describe('Controller', () => {
       const child = controller.itemStore.findContainer('makes.[].models', [{ makeId: 'suzuki' }],
         { modelId: 'swift' });
       const result = controller.constructLinkUrl(child, 'variants');
-      expect(result).toBe('/makes/suzuki/models/swift/variants');
+      expect(result).toBe(`/makes/suzuki/undefined/models/swift/${child.item.__iid}/variants`);
     });
   });
   describe('loadDetail', () => {
@@ -355,6 +355,182 @@ describe('Controller', () => {
       const parentContainer = controller.itemStore.findContainer('parents', [],
         { parentId: 2 }, ItemContainer.detailLevel.summary);
       expect(parentContainer).toBeTruthy();
+    });
+  });
+  describe('loadSearchResult', () => {
+    it('loads the children of a parent item when parent is not loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchCollectionSummary = jest.fn();
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        items: [{ modelId: 'telstar' }],
+        totalPages: 2,
+      });
+      const controller = new Controller(schema, apiProxy);
+      await controller.loadSearchResult('makes.[].models', [{ makeId: 'ford' }], 2, '');
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledWith('makes.[].models',
+        [{ makeId: 'ford' }], 2, '');
+      const searchResult = controller.getSearchResult('makes.[].models', [{ makeId: 'ford' }]);
+      expect(searchResult.totalPages).toBe(2);
+      expect(searchResult.containers).toHaveLength(1);
+      expect(searchResult.containers[0].item).toMatchObject({ modelId: 'telstar' });
+    });
+    it('loads the children of a parent item when parent is loaded and not new', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchCollectionSummary = jest.fn();
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        items: [{ modelId: 'telstar' }],
+        totalPages: 2,
+      });
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes', [], [{ makeId: 'ford' }],
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      await controller.loadSearchResult('makes.[].models', [{ makeId: 'ford' }], 2, '');
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledWith('makes.[].models',
+        [{ makeId: 'ford' }], 2, '');
+      const searchResult = controller.getSearchResult('makes.[].models', [{ makeId: 'ford' }]);
+      expect(searchResult.totalPages).toBe(2);
+      expect(searchResult.containers).toHaveLength(1);
+      expect(searchResult.containers[0].item).toMatchObject({ modelId: 'telstar' });
+    });
+    it('does not load the children of a parent item when parent is new', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchCollectionSummary = jest.fn();
+      const controller = new Controller(schema, apiProxy);
+      const parentContainer = controller.addContainer('makes', []);
+      await controller.loadSearchResult('makes.[].models', [parentContainer.getIds()], 2, '');
+      expect(apiProxy.fetchCollectionSummary).toHaveBeenCalledTimes(0);
+      const searchResult = controller.getSearchResult('makes.[].models', [{ makeId: 'ford' }]);
+      expect(searchResult.totalPages).toBe(1);
+      expect(searchResult.containers).toHaveLength(0);
+    });
+  });
+  describe('loadDetailById', () => {
+    it('loads the detail when not already loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      apiProxy.fetchJson.mockReturnValue({ modelId: 'capri', name: 'Capri' });
+      const controller = new Controller(schema, apiProxy);
+      await controller.loadDetailByIds('makes.[].models',
+        [{ makeId: 'ford' }], { modelId: 'capri' });
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(1);
+      expect(apiProxy.fetchJson).toHaveBeenCalledWith('http://localhost/makes/ford/models/capri');
+      const container = controller.itemStore.findContainer('makes.[].models',
+        [{ makeId: 'ford' }], { modelId: 'capri' }, ItemContainer.detailLevel.detail);
+      expect(container).toBeTruthy();
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+    });
+    it('does not load the detail when already loaded', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost');
+      apiProxy.fetchJson = jest.fn();
+      apiProxy.fetchJson.mockReturnValue({ modelId: 'capri', name: 'Capri' });
+      const controller = new Controller(schema, apiProxy);
+      controller.itemStore.load('makes.[].models',
+        [{ makeId: 'ford' }], [{ modelId: 'capri' }],
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      await controller.loadDetailByIds('makes.[].models',
+        [{ makeId: 'ford' }], { modelId: 'capri' });
+      expect(apiProxy.fetchJson).toHaveBeenCalledTimes(0);
+    });
+  });
+  describe('loadSearchResult', () => {
+    it('does not lose changes when navigating between pages', async () => {
+      const apiProxy = new ApiProxy(schema, 'http://localhost', {
+        collectionSummariesIncludesFullEntities: true,
+      });
+      apiProxy.fetchCollectionSummary = jest.fn();
+      const controller = new Controller(schema, apiProxy);
+
+      // load first page of summary
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        totalPages: 2,
+        items: [
+          { makeId: 'ford', name: 'Ford' },
+        ],
+      });
+      await controller.loadSearchResult('makes', [], 1, '');
+      let container = controller.getSearchResult('makes', []).containers[0];
+      expect(container).toBeTruthy();
+      expect(container.item).toMatchObject({ makeId: 'ford', name: 'Ford' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.summary);
+
+      // load detail
+      await controller.loadDetail(container);
+      expect(container.item).toMatchObject({ makeId: 'ford', name: 'Ford' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+
+      // make changes
+      container.setItemFieldValue('name', 'zzzz');
+
+      // load another page
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        totalPages: 2,
+        items: [
+          { makeId: 'toyota', name: 'Toyota' },
+        ],
+      });
+      await controller.loadSearchResult('makes', [], 2, '');
+      // eslint-disable-next-line prefer-destructuring
+      container = controller.getSearchResult('makes', []).containers[0];
+      await controller.loadDetail(container);
+      expect(container.item).toMatchObject({ makeId: 'toyota', name: 'Toyota' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+
+      // load first page again
+      apiProxy.fetchCollectionSummary.mockReturnValue({
+        totalPages: 2,
+        items: [
+          { makeId: 'ford', name: 'Ford' },
+        ],
+      });
+      await controller.loadSearchResult('makes', [], 1, '');
+      // eslint-disable-next-line prefer-destructuring
+      container = controller.getSearchResult('makes', []).containers[0];
+
+      // load detail
+      await controller.loadDetail(container);
+      expect(container.item).toMatchObject({ makeId: 'ford', name: 'zzzz' });
+      expect(container.metadata.detailLevel).toEqual(ItemContainer.detailLevel.detail);
+    });
+  });
+  describe('constructParentUrl', () => {
+    it('returns the collection from an element of a base collection', () => {
+      const controller = new Controller(schema, null, {
+        baseClientPath: 'http://localhost:9001/test',
+      });
+      const container = new ItemContainer('makes',
+        [],
+        schema, null,
+        { makeId: 'mg' },
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const result = controller.constructParentUrl(container);
+      expect(result).toEqual('http://localhost:9001/test/makes');
+    });
+    it('returns the parent collection of an element', () => {
+      const controller = new Controller(schema, null, {
+        baseClientPath: 'http://localhost:9001/test',
+      });
+      const container = new ItemContainer('makes.[].models',
+        [{ makeId: 'mg' }],
+        schema, null,
+        { modelId: 'bgt' },
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const result = controller.constructParentUrl(container);
+      expect(result).toEqual(`http://localhost:9001/test/makes/mg/undefined/models`);
+    });
+    it('returns the parent collection of an element with grandparents', () => {
+      const controller = new Controller(schema, null, {
+        baseClientPath: 'http://localhost:9001/test',
+      });
+      const container = new ItemContainer('makes.[].models.[].variants',
+        [{ makeId: 'mg' }, { modelId: 'bgt' }],
+        schema, null,
+        { variantId: 'mk1' },
+        ItemContainer.detailLevel.detail, ItemContainer.owner.detail);
+      const result = controller.constructParentUrl(container);
+      expect(result)
+        .toEqual('http://localhost:9001/test/makes/mg/undefined/models/bgt/undefined/variants');
     });
   });
   describe('loadSearchResult', () => {

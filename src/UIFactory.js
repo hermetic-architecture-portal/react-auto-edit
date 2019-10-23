@@ -16,6 +16,7 @@ import EditItemTabular from './components/EditItemTabular';
 import EditCollectionTabular from './components/EditCollectionTabular';
 import EditCollection from './components/EditCollection';
 import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
+import EditItemStandalone from './components/EditItemStandalone';
 
 /**
  * @typedef {import('./ItemContainer').default} ItemContainer
@@ -23,6 +24,11 @@ import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
 
 /**
  * @typedef {import('./Controller').default} Controller
+ */
+
+/**
+ * @typedef {Object} UIFactoryOptions
+ * @property {string} preferredDisplayMode
  */
 
 /**
@@ -39,6 +45,12 @@ import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
  * @property {boolean} isRequired
  */
 
+/**
+ * @typedef {Object} RouteArgs
+ * @property {Object} history
+ * @property {Object} location
+ * @property {Object} match
+ */
 
 /**
  * @typedef {Object} ItemOptions
@@ -55,9 +67,29 @@ import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
  * @property {Object} itemSchemaDesc- Joi item schema description
  * @property {array} parentIds
  * @property {boolean} rootComponent - indicates if the component is shown as the root UI component or as a child of an item in a collection
+ * @property {RouteArgs} routeArgs
+ */
+
+/**
+ * @typedef {Object} StandaloneItemOptions
+ * @property {Controller} controller
+ * @property {string} collectionSchemaPath
+ * @property {array} parentIds
+ * @property {object} ids
+ * @property {RouteArgs} routeArgs
  */
 
 class UIFactory {
+  /**
+   * @param {UIFactoryOptions} options
+   */
+  constructor(options) {
+    const fullOptions = Object.assign({
+      preferredDisplayMode: UIFactory.displayModes.masterDetail,
+    }, options || {});
+    this.options = fullOptions;
+  }
+
   /**
    * @param {FieldOptions} options
    */
@@ -167,25 +199,54 @@ class UIFactory {
   }
 
   /**
+   * This probably isn't the method you're looking for
+   * It controls how the wrapper around a single item is rendered
+   * When the URL points to a single item, not a collection
+   * @param {StandaloneItemOptions} options
+   */
+  createEditItemStandalone(options) {
+    const {
+      controller, collectionSchemaPath, parentIds, ids, routeArgs,
+    } = options;
+    return <EditItemStandalone controller={controller}
+      collectionSchemaPath={collectionSchemaPath}
+      parentIds={parentIds}
+      ids={ids} history={routeArgs.history} />;
+  }
+
+  /**
    * @param {CollectionOptions} options
    */
   createEditCollection(options) {
     const {
-      controller, collectionSchemaPath, parentIds, rootComponent,
+      controller, collectionSchemaPath, parentIds, rootComponent, routeArgs,
     } = options;
-    if (EditCollectionTabular.canShowCollection(controller.schema, collectionSchemaPath)) {
+
+    let mode = UIFactory.displayModes.masterDetail;
+    if (EditCollectionTabular.canShowCollection(controller.schema, collectionSchemaPath)
+      && (
+        (!rootComponent) // child collections can only be displayed inline with parent using tabular mode
+        || this.options.preferredDisplayMode === UIFactory.displayModes.tabular
+      )
+    ) {
+      mode = UIFactory.displayModes.tabular;
+    }
+
+    if (mode === UIFactory.displayModes.tabular) {
       return <EditCollectionTabular
-        controller={controller}
-        schemaPath={collectionSchemaPath}
-        parentIds={parentIds}
-        rootComponent={rootComponent}
-        />;
+      controller={controller}
+      schemaPath={collectionSchemaPath}
+      parentIds={parentIds}
+      rootComponent={rootComponent}
+      history={routeArgs.history}
+      />;
     }
     return <EditCollection
       controller={controller}
       schemaPath={collectionSchemaPath}
       parentIds={parentIds}
       rootComponent={true}
+      history={routeArgs.history}
       />;
   }
 
@@ -220,5 +281,10 @@ class UIFactory {
     return window.confirm(message);
   }
 }
+
+UIFactory.displayModes = {
+  tabular: 'TABULAR',
+  masterDetail: 'MASTERDETAIL',
+};
 
 export default UIFactory;

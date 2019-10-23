@@ -1,5 +1,6 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import base64 from 'base64-arraybuffer';
+import uuid from 'uuid/v4';
 import { observer } from 'mobx-react';
 
 const readPromise = file => new Promise((resolve, reject) => {
@@ -44,11 +45,24 @@ const EditFieldImage = ({
         <img src={`data:image/png;base64,${img}`} alt=''/>
         <div className="Ed-button" onClick={removeImage}>&nbsp;x&nbsp;</div>
       </div>;
+  const id = uuid();
+
+  const uploadClassName = `Ed-button Ed-button-upload ${readonly ? 'disabled' : ''}`;
+  const clearClassName = `Ed-button Ed-button-clear ${img ? '' : 'disabled'}`;
+
   return <div className='Ed-image'>
     <div>
-      <input type="file" accept="image/*" multiple={false} ref={imageInput}
+      <input id={id} type="file" accept="image/*" multiple={false} ref={imageInput}
         readOnly={readonly}
         onChange={fileSelected} />
+      <label htmlFor={id} >
+        <div className={uploadClassName}>
+          Choose file
+        </div>
+      </label>
+      <div className={clearClassName} onClick={removeImage}>
+        Remove image
+      </div>
     </div>
     {imgElement}
   </div>;

@@ -19,6 +19,7 @@ class EditCollectionAbstract extends React.Component {
     this.next = this.next.bind(this);
     this.prev = this.prev.bind(this);
     this.addItem = this.addItem.bind(this);
+    this.addItemFullPage = this.addItemFullPage.bind(this);
   }
 
   getUrl() {
@@ -133,6 +134,13 @@ class EditCollectionAbstract extends React.Component {
     }
   }
 
+  edit(container) {
+    const nextUrl = this.props.controller.constructLinkUrl(container);
+    const currentUrl = new window.URL(this.getUrl());
+    const returnToken = btoa(`${currentUrl.pathname}${currentUrl.search}`);
+    this.props.history.push(`${nextUrl}?return=${returnToken}`);
+  }
+
   canGoNext() {
     return this.status.page < this.getSearchResult().totalPages;
   }
@@ -151,14 +159,20 @@ class EditCollectionAbstract extends React.Component {
     this.setCurrentItem(newContainer.item);
   }
 
+  addItemFullPage() {
+    const { controller, schemaPath, parentIds } = this.props;
+    const newContainer = controller.addContainer(schemaPath, parentIds);
+    this.edit(newContainer);
+  }
+
   renderNavControls(searchResult) {
     const pageControls = [];
     pageControls.push(<div key="totalpages">{`Page ${this.status.page}/${searchResult.totalPages}`}</div>);
-    const prevPageClassName = this.canGoPrev() ? 'Ed-button' : 'Ed-button disabled';
+    const prevPageClassName = `Ed-button Ed-button-prev ${this.canGoPrev() ? '' : 'disabled'}`;
     pageControls.push(<div key="prev" className={prevPageClassName} onClick={this.prev}>
       &lt;
     </div>);
-    const nextPageClassName = this.canGoNext() ? 'Ed-button' : 'Ed-button disabled';
+    const nextPageClassName = `Ed-button Ed-button-next ${this.canGoNext() ? '' : 'disabled'}`;
     pageControls.push(<div key="next" className={nextPageClassName} onClick={this.next}>
       &gt;
     </div>);
@@ -168,10 +182,16 @@ class EditCollectionAbstract extends React.Component {
           value={this.status.filter}
           onChange={this.filterChanged}/>
       </div>
-      {pageControls}
-      <div className="Ed-button"
-        onClick={this.addItem}>
-        Add <span className="Ed-shortcut-char">i</span>tem
+      <div>
+        {pageControls}
+        <div className="Ed-button Ed-button-new"
+          onClick={this.addItem}>
+          Add <span className="Ed-shortcut-char">i</span>tem
+        </div>
+        <div className="Ed-button Ed-button-new-full-page"
+          onClick={this.addItemFullPage}>
+          Add in new screen
+        </div>
       </div>
     </div>;
   }

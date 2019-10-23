@@ -25,7 +25,7 @@ describe('EditCollectionTabular', () => {
         EditCollectionTabular.canShowCollection(schema, 'items'),
       ).toBe(false);
     });
-    it('returns false if there is a big string', () => {
+    it('returns true if there is a big string', () => {
       const schema = Joi.object({
         items: Joi.array().items({
           childId: Joi.string().max(200),
@@ -33,7 +33,7 @@ describe('EditCollectionTabular', () => {
       });
       expect(
         EditCollectionTabular.canShowCollection(schema, 'items'),
-      ).toBe(false);
+      ).toBe(true);
     });
     it('returns true if there is a small string', () => {
       const schema = Joi.object({
@@ -44,6 +44,16 @@ describe('EditCollectionTabular', () => {
       expect(
         EditCollectionTabular.canShowCollection(schema, 'items'),
       ).toBe(true);
+    });
+    it('returns false if there is an image field', () => {
+      const schema = Joi.object({
+        items: Joi.array().items({
+          img: Joi.string().meta({ image: true }),
+        }),
+      });
+      expect(
+        EditCollectionTabular.canShowCollection(schema, 'items'),
+      ).toBe(false);
     });
   });
 });

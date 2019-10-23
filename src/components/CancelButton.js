@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
  * @param {Controller} props.controller
  */
 const CancelButton = ({ controller }) => {
-  let className = 'Ed-button';
+  let className = 'Ed-button Ed-button-cancel';
   if (!controller.isDirty()) {
     className = `${className} disabled`;
   }

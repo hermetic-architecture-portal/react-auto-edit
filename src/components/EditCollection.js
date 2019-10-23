@@ -2,8 +2,6 @@ import React from 'react'; // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react';
 import { HotKeys } from 'react-hotkeys';
 import EditCollectionAbstract from './EditCollectionAbstract';
-import utils from '../utils';
-import ItemContainer from '../ItemContainer';
 
 /**
  * @typedef {import('../Controller').default} Controller
@@ -56,20 +54,27 @@ class EditCollection extends EditCollectionAbstract {
         key={c.getKey()}
         className="Ed-row" >
         <div className="Ed-column">
-          <a className={className} onClick={event => this.linkClicked(event, c.item)}
+          <div className={className} onClick={event => this.linkClicked(event, c.item)}
             href={`#${c.getKey()}`} >
             {c.getDisplayName()}
-          </a>
+            <div className="Ed-container-link-full-page-edit" onClick={() => this.edit(c)}></div>
+          </div>
         </div>
         <div className="Ed-column-button">
-          <div className="Ed-button"
+          <div className="Ed-button Ed-button-full-page-edit"
+            onClick={() => this.edit(c)}>
+            Edit
+          </div>
+        </div>
+        <div className="Ed-column-button">
+          <div className="Ed-button Ed-button-delete"
             onClick={() => controller.deleteContainer(c)}>
             Delete
           </div>
         </div>
       </div>;
     });
-    return <div>
+    return <div className="Ed-collection">
       <HotKeys keyMap={{ INSERT: 'ctrl+i' }}
         handlers={{ INSERT: this.addItem }}>
         <div className="Ed-two-col-wrapper">

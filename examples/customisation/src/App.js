@@ -66,6 +66,7 @@ class CustomUIFactory extends UIFactory {
         schemaPath={options.collectionSchemaPath}
         parentIds={options.parentIds}
         rootComponent={options.rootComponent}
+        history={options.routeArgs.history}
         />;
     }
     return super.createEditCollection(options);

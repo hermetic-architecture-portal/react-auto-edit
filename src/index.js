@@ -19,6 +19,7 @@ import EditFieldGroupTabular from './components/EditFieldGroupTabular';
 import EditFieldImage from './components/EditFieldImage';
 import EditFieldNumber from './components/EditFieldNumber';
 import EditFieldRestrictedValues from './components/EditFieldRestrictedValues';
+import EditItemStandalone from './components/EditItemStandalone';
 import EditFieldString from './components/EditFieldString';
 import EditFieldUri from './components/EditFieldUri';
 import EditItem from './components/EditItem';
@@ -51,6 +52,7 @@ export {
   EditFieldImage,
   EditFieldNumber,
   EditFieldRestrictedValues,
+  EditItemStandalone,
   EditFieldString,
   EditFieldUri,
   EditItem,

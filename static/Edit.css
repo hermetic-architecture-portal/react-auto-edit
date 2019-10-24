@@ -250,7 +250,7 @@ input[type="file"] {
 .Ed-two-col-wrapper .Ed-tabular-collection textarea 
 {
   resize: none;
-  height: 1em;
+  height: 2em;
   width: 230px;
   box-sizing: content-box;
 }
@@ -258,7 +258,7 @@ input[type="file"] {
 .Ed-tabular-collection textarea
 {
   resize: none;
-  height: 1em;
+  height: 2em;
   width: 230px;
   box-sizing: content-box;
 }

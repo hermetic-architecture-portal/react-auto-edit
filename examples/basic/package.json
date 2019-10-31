@@ -1,12 +1,12 @@
 {
   "name": "basic-example",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "private": true,
   "dependencies": {
     "joi": "^14.3.1",
     "joi-key-extensions": "^1.0.9",
     "react": "^16.9.0",
-    "react-auto-edit": "^2.3.1",
+    "react-auto-edit": "^2.3.2",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1"

@@ -250,17 +250,19 @@ input[type="file"] {
 .Ed-two-col-wrapper .Ed-tabular-collection textarea 
 {
   resize: none;
-  height: 1em;
+  height: auto;
   width: 230px;
-  box-sizing: content-box;
+  vertical-align: top;
+  margin: 0px;
 }
 
 .Ed-tabular-collection textarea
 {
   resize: none;
-  height: 1em;
+  height: auto;
   width: 230px;
-  box-sizing: content-box;
+  vertical-align: top;
+  margin: 0px;
 }
 
 .Ed-tabular-collection textarea:focus {
@@ -313,7 +315,12 @@ input[type="file"] {
 }
 
 .Ed-content textarea {
-  font-family: sans-serif;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.Ed-content input {
+  font-size: 12px;
 }
 
 .Ed-menu-button {

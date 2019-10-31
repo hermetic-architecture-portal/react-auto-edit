@@ -14,6 +14,7 @@ const EditFieldBigString = ({
   fieldName, container, maxLength, minLength, readonly,
 }) => <textarea
   value={container.getItemFieldValue(fieldName)}
+  rows={1}
   maxLength={maxLength} minLength={minLength} readOnly={readonly}
   onChange={event => container.setItemFieldValue(fieldName, event.target.value)} />;
 

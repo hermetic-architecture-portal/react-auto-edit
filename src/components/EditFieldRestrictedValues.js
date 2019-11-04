@@ -35,6 +35,7 @@ const EditFieldStringWithSuggestions = ({
     value={selectedOption}
     isDisabled={readonly}
     isClearable={!isRequired}
+    menuPortalTarget={document.body}
     onChange={(x) => {
       if (x) {
         container.setItemFieldValue(fieldName, x.value);

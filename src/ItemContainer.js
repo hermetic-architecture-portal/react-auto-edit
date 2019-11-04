@@ -51,6 +51,25 @@ class ItemContainer {
     this.metadata.parentIds.replace(parentIds);
   }
 
+  populateDefaults() {
+    Object.getOwnPropertyNames(this.itemSchemaDesc.children)
+      .forEach((fieldName) => {
+        if (this.item && (typeof this.item[fieldName] === 'undefined')) {
+          const fieldSchemaDesc = this.itemSchemaDesc.children[fieldName];
+          if ((fieldSchemaDesc.type === 'array')
+            && fieldSchemaDesc.items && fieldSchemaDesc.items.length
+            && fieldSchemaDesc.flags
+            && (fieldSchemaDesc.flags.presence === 'required')
+            && (fieldSchemaDesc.items[0].type === 'object')) {
+            this.setItemFieldValue(fieldName, []);
+          } else if (fieldSchemaDesc.flags
+            && (typeof fieldSchemaDesc.flags.default !== 'undefined')) {
+            this.setItemFieldValue(fieldName, fieldSchemaDesc.flags.default);
+          }
+        }
+      });
+  }
+
   replaceItem(item) {
     Object.getOwnPropertyNames(this.item)
       .filter(fieldName => fieldName !== constants.internalIdField)

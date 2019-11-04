@@ -129,4 +129,73 @@ describe('ItemContainer', () => {
       expect(result[0]).toEqual({ makeId: 'toyota' });
     });
   });
+  describe('populateDefaults', () => {
+    it('applies explicit defaults', () => {
+      const defaultSchema = Joi.object({
+        rows: Joi.array().items({
+          numberDefault: Joi.number().default(5),
+          stringDefault: Joi.string().default('abc'),
+        }),
+      });
+      const container = new ItemContainer('rows', [],
+        defaultSchema,
+        defaultSchema.describe().children.rows.items[0],
+        {}, ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
+        ItemContainer.changeTypes.add, () => {});
+      container.populateDefaults();
+      expect(container.item).toMatchObject({
+        numberDefault: 5,
+        stringDefault: 'abc',
+      });
+    });
+    it('initialises required arrays', () => {
+      const requiredArraySchema = Joi.object({
+        rows: Joi.array().items({
+          id: Joi.number(),
+          children: Joi.array().items({
+            id: Joi.number(),
+          }).required(),
+        }),
+      });
+      const container = new ItemContainer('rows', [],
+        requiredArraySchema,
+        requiredArraySchema.describe().children.rows.items[0],
+        {}, ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
+        ItemContainer.changeTypes.add, () => {});
+      container.populateDefaults();
+      expect(Array.isArray(container.item.children)).toBeTruthy();
+    });
+    it('does not initialise required string arrays', () => {
+      const requiredArraySchema = Joi.object({
+        rows: Joi.array().items({
+          id: Joi.number(),
+          children: Joi.array().items(Joi.string()).required(),
+        }),
+      });
+      const container = new ItemContainer('rows', [],
+        requiredArraySchema,
+        requiredArraySchema.describe().children.rows.items[0],
+        {}, ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
+        ItemContainer.changeTypes.add, () => {});
+      container.populateDefaults();
+      expect(container.item.children).toBeFalsy();
+    });
+    it('does not initialise optional arrays', () => {
+      const optionalArraySchema = Joi.object({
+        rows: Joi.array().items({
+          id: Joi.number(),
+          children: Joi.array().items({
+            id: Joi.number(),
+          }),
+        }),
+      });
+      const container = new ItemContainer('rows', [],
+        optionalArraySchema,
+        optionalArraySchema.describe().children.rows.items[0],
+        {}, ItemContainer.detailLevel.detail, ItemContainer.owner.detail,
+        ItemContainer.changeTypes.add, () => {});
+      container.populateDefaults();
+      expect(container.item.children).toBeFalsy();
+    });
+  });
 });

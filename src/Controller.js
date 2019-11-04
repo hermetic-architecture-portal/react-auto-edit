@@ -402,7 +402,9 @@ class Controller {
   }
 
   addContainer(collectionSchemaPath, parentIds) {
-    return this.itemStore.addContainer(collectionSchemaPath, parentIds);
+    const container = this.itemStore.addContainer(collectionSchemaPath, parentIds);
+    container.populateDefaults();
+    return container;
   }
 
   /**

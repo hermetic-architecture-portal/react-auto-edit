@@ -149,7 +149,7 @@ class UIFactory {
       return <EditFieldString readonly={readonly}
         fieldName={fieldName} required={isRequired}
         container={container}
-        suggestedValues={utils.getSuggestedValues(fieldSchemaDesc)}        
+        suggestedValues={utils.getSuggestedValues(fieldSchemaDesc)}
         maxLength={max}
         minLength={min} />;
     }

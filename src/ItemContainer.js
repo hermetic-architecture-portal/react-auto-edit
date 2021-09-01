@@ -1,6 +1,6 @@
 import { observable, extendObservable } from 'mobx';
 import clone from 'clone-deep';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import utils from './utils';
 import constants from './constants';
 
@@ -205,15 +205,15 @@ class ItemContainer {
 
   getDisplayNameFieldNames() {
     const result = Object
-      .getOwnPropertyNames(this.itemSchemaDesc.children)
-      .filter(fieldName => this.itemSchemaDesc.children[fieldName].meta
-        && this.itemSchemaDesc.children[fieldName].meta
+      .getOwnPropertyNames(this.itemschemaDesc.keys)
+      .filter(fieldName => this.itemschemaDesc.keys[fieldName].meta
+        && this.itemschemaDesc.keys[fieldName].meta
           .some(meta => meta.displayName));
     if (result.length) {
       return result;
     }
     if (Object
-      .getOwnPropertyNames(this.itemSchemaDesc.children)
+      .getOwnPropertyNames(this.itemschemaDesc.keys)
       .includes('name')) {
       return ['name'];
     }
@@ -232,7 +232,7 @@ class ItemContainer {
 
   getFieldSchemaDesc(fieldName) {
     return utils.normaliseAlternativesSchema(
-      this.itemSchemaDesc.children[fieldName],
+      this.itemschemaDesc.keys[fieldName],
     );
   }
 
@@ -251,7 +251,7 @@ class ItemContainer {
       if (!fkParentValue) {
         return null;
       }
-      const fkParentFieldSchema = this.itemSchemaDesc.children[parentFieldName];
+      const fkParentFieldSchema = this.itemschemaDesc.keys[parentFieldName];
       const fkParentTargetFieldName = utils.getFkTargetFieldName(fkParentFieldSchema);
       const fkParentIdSet = {};
       fkParentIdSet[fkParentTargetFieldName] = fkParentValue;
@@ -269,12 +269,12 @@ class ItemContainer {
   }
 
   getChildFkFieldNames(fieldName) {
-    return Object.getOwnPropertyNames(this.itemSchemaDesc.children)
+    return Object.getOwnPropertyNames(this.itemschemaDesc.keys)
       .filter((otherFieldName) => {
         if (otherFieldName === fieldName) {
           return false;
         }
-        const otherFkArg = utils.findRuleArg(this.itemSchemaDesc.children[otherFieldName], 'fk');
+        const otherFkArg = utils.findRuleArg(this.itemschemaDesc.keys[otherFieldName], 'fk');
         return (otherFkArg && otherFkArg.options
           && (otherFkArg.options.parentFieldName === fieldName));
       });

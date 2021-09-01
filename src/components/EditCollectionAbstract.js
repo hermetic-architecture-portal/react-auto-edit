@@ -128,7 +128,7 @@ class EditCollectionAbstract extends React.Component {
 
   prev() {
     if (this.canGoPrev()) {
-      this.status.page = this.status.page - 1;
+      this.status.page += -1;
       this.encodeStatus();
       this.load();
     }
@@ -147,7 +147,7 @@ class EditCollectionAbstract extends React.Component {
 
   next() {
     if (this.canGoNext()) {
-      this.status.page = this.status.page + 1;
+      this.status.page += 1;
       this.encodeStatus();
       this.load();
     }
@@ -196,6 +196,5 @@ class EditCollectionAbstract extends React.Component {
     </div>;
   }
 }
-
 
 export default EditCollectionAbstract;

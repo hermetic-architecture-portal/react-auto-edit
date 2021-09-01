@@ -186,7 +186,6 @@ class ApiProxy {
         || (x[displayFieldName].toUpperCase().includes(filter.toUpperCase())));
   }
 
-
   /**
   * @return {PagedResult}
   */

@@ -6,7 +6,7 @@
   "types": "types",
   "scripts": {
     "test": "jest",
-    "build": "babel src -d lib && tsc",
+    "build": "eslint src && babel src -d lib && tsc",
     "watch": "nodemon --ignore lib --exec \"babel src -d lib\""
   },
   "author": "",

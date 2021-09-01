@@ -66,7 +66,7 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
   const result = [];
   const schemaDesc = utils.reach(controller.schema, schemaPath).describe();
   if (schemaDesc.type === 'object') {
-    Object.getOwnPropertyNames(schemaDesc.children).forEach((fieldName) => {
+    Object.getOwnPropertyNames(schemaDesc.keys).forEach((fieldName) => {
       const nextUrlPath = `${urlPath}/${encodeURIComponent(fieldName)}`;
       const nextSchemaPath = schemaPath ? `${schemaPath}.${fieldName}` : fieldName;
       result.push(...buildEditRoutes(
@@ -90,7 +90,7 @@ const buildEditRoutes = (urlPath, controller, schemaPath = '', parentPks = []) =
     const pkFields = utils.getPrimaryKeyFieldNames(nextSchemaDesc)
       .map(fieldName => ({
         fieldName,
-        fieldSchemaDesc: nextSchemaDesc.children[fieldName],
+        fieldSchemaDesc: nextSchemaDesc.keys[fieldName],
       }));
     const pkFieldsPart = pkFields
       .map(pk => `:${pk.fieldName}`)

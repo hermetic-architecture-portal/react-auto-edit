@@ -1,6 +1,6 @@
 import React from 'react'; // eslint-disable-line no-unused-vars
 import base64 from 'base64-arraybuffer';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { observer } from 'mobx-react';
 
 const readPromise = file => new Promise((resolve, reject) => {

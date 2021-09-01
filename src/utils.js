@@ -3,8 +3,8 @@ const isPkField = fieldSchemaDesc => fieldSchemaDesc.rules
     .some(r => r.name === 'pk');
 
 const getPrimaryKeyFieldNames = schemaDesc => Object
-  .getOwnPropertyNames(schemaDesc.children)
-  .filter(fieldName => isPkField(schemaDesc.children[fieldName]));
+  .getOwnPropertyNames(schemaDesc.keys)
+  .filter(fieldName => isPkField(schemaDesc.keys[fieldName]));
 
 const normaliseAlternativesSchema = (fieldSchemaDesc) => {
   if ((fieldSchemaDesc.type === 'alternatives') && fieldSchemaDesc.base) {
@@ -37,8 +37,8 @@ const reach = (schema, path) => {
     if (schema._inner.items && schema._inner.items.length) {
       return reach(schema._inner.items[0], nextPath(chunks));
     }
-  } else if (schema._inner.children) {
-    const childSchema = schema._inner.children.find(c => c.key === currentChunk);
+  } else if (schema._inner.keys) {
+    const childSchema = schema._inner.keys.find(c => c.key === currentChunk);
     if (childSchema) {
       return reach(childSchema.schema, nextPath(chunks));
     }
@@ -98,15 +98,15 @@ const isRequiredField = fieldSchemaDesc => fieldSchemaDesc.flags
 
 const getDisplayNameFieldNames = (schemaDesc) => {
   const result = Object
-    .getOwnPropertyNames(schemaDesc.children)
-    .filter(fieldName => schemaDesc.children[fieldName].meta
-      && schemaDesc.children[fieldName].meta
+    .getOwnPropertyNames(schemaDesc.keys)
+    .filter(fieldName => schemaDesc.keys[fieldName].meta
+      && schemaDesc.keys[fieldName].meta
         .some(meta => meta.displayName));
   if (result.length) {
     return result;
   }
   if (Object
-    .getOwnPropertyNames(schemaDesc.children)
+    .getOwnPropertyNames(schemaDesc.keys)
     .includes('name')) {
     return ['name'];
   }
@@ -117,8 +117,8 @@ const isGeneratedField = fieldSchemaDesc => fieldSchemaDesc.meta
   && fieldSchemaDesc.meta.some(m => m.generated);
 
 const hasGeneratedField = itemSchemaDesc => Object
-  .getOwnPropertyNames(itemSchemaDesc.children)
-  .some(fieldName => isGeneratedField(itemSchemaDesc.children[fieldName]));
+  .getOwnPropertyNames(itemSchemaDesc.keys)
+  .some(fieldName => isGeneratedField(itemSchemaDesc.keys[fieldName]));
 
 const isHiddenField = fieldSchemaDesc => fieldSchemaDesc.meta
   && fieldSchemaDesc.meta.some(m => m.hidden);

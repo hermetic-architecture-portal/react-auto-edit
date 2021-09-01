@@ -46,11 +46,11 @@ class EditItemTabular extends React.Component {
     let fields;
 
     if (!container) {
-      fields = Object.getOwnPropertyNames(itemSchemaDesc.children)
+      fields = Object.getOwnPropertyNames(itemSchemaDesc.keys)
         .map(fieldName => <td key={fieldName}
           className={this.isHiddenField(container, fieldName)}></td>);
     } else {
-      fields = Object.getOwnPropertyNames(itemSchemaDesc.children)
+      fields = Object.getOwnPropertyNames(itemSchemaDesc.keys)
         .map(fieldName => <td key={fieldName}
           className={this.isHiddenField(container, fieldName)}>
             <EditFieldGroupTabular

@@ -74,6 +74,46 @@ const App = () => <Router>
 export default App;
 ```
 
+Unfortunately Joi is now being published with the "browser" property in its package.json pointing to a cut down
+version of Joi that does not support some required features.  Also unfortunately, a workaround is required with Create React App to get this property ignored.
+
+```shell
+npm install --save craco
+```
+Edit myapp/package.json:
+```diff
+/* package.json */
+
+"scripts": {
+-   "start": "react-scripts start",
++   "start": "craco start",
+-   "build": "react-scripts build",
++   "build": "craco build"
+-   "test": "react-scripts test",
++   "test": "craco test"
+}
+```
+
+Add craco.config.js at the same level as your package.json:
+
+```js
+const path = require('path');
+
+module.exports = {
+  webpack: {
+    configure: {
+      resolve: {
+        alias: {
+          // ignore the cut down browser distribution that 
+          // joi's package.json steers webpack to
+          joi: path.resolve(__dirname, 'node_modules/joi/lib/index.js'),
+        },
+      },
+    },
+  },
+};
+```
+
 ## Conventions
 
 ### Schema

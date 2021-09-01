@@ -35,7 +35,6 @@ const EditFieldDate = ({
     }
   };
 
-
   const onTimeChange = (event) => {
     if (!event.target.value) {
       container.setItemFieldValue(fieldName, undefined);

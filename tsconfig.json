@@ -14,7 +14,8 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "outDir": "types",
-    "jsx": "react"
+    "jsx": "react",
+    "skipLibCheck": true,
   },
   "include": ["src"]
 }

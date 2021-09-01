@@ -23,9 +23,8 @@ const schema = Joi.object({
   }),
 });
 
-const findRouteByPath = (routes, path) => {
-  return routes.findWhere(r => r.prop('path') === path);
-};
+const findRouteByPath = (routes, path) => routes
+  .findWhere(r => r.prop('path') === path);
 
 describe('EditRoutes', () => {
   const apiProxy = new ApiProxy(schema, 'http://localhost');

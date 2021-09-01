@@ -71,7 +71,7 @@ describe('ItemContainer', () => {
     it('matches if parent ids and ids the same', () => {
       const container = new ItemContainer('makes.[].models', [{ makeId: 'a' }],
         schema,
-        schema.describe().keys.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         { modelId: 'x' });
       const candidate = { modelId: 'x' };
       candidate.__iid = 'blah';
@@ -80,7 +80,7 @@ describe('ItemContainer', () => {
     it('fails if parent ids different and ids the same', () => {
       const container = new ItemContainer('makes.[].models', [{ makeId: 'a' }],
         schema,
-        schema.describe().keys.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         { modelId: 'x' });
       const candidate = { modelId: 'x' };
       candidate.__iid = 'blah';
@@ -89,7 +89,7 @@ describe('ItemContainer', () => {
     it('matches if parent iids and iids the same', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e' }],
         schema,
-        schema.describe().keys.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const candidate = {};
       candidate.__iid = container.item.__iid;
@@ -98,7 +98,7 @@ describe('ItemContainer', () => {
     it('fails if parent iids and iids different', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e' }],
         schema,
-        schema.describe().keys.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const candidate = { __iid: 'f' };
       expect(container.matches('makes.[].models', [{ __iid: 'g' }], candidate)).toBeFalsy();
@@ -106,7 +106,7 @@ describe('ItemContainer', () => {
     it('fails if parent iids and iids different, and parent has undef fields', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e', makeId: undefined }],
         schema,
-        schema.describe().keys.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const candidate = { __iid: 'f' };
       expect(container
@@ -122,7 +122,7 @@ describe('ItemContainer', () => {
     it('removes iids', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e', makeId: 'toyota' }],
         schema,
-        schema.describe().keys.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const result = container.getCleanParentIds();
       expect(result).toHaveLength(1);

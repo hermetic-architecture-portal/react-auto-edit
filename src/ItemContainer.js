@@ -205,15 +205,15 @@ class ItemContainer {
 
   getDisplayNameFieldNames() {
     const result = Object
-      .getOwnPropertyNames(this.itemschemaDesc.keys)
-      .filter(fieldName => this.itemschemaDesc.keys[fieldName].meta
-        && this.itemschemaDesc.keys[fieldName].meta
+      .getOwnPropertyNames(this.itemSchemaDesc.keys)
+      .filter(fieldName => this.itemSchemaDesc.keys[fieldName].metas
+        && this.itemSchemaDesc.keys[fieldName].metas
           .some(meta => meta.displayName));
     if (result.length) {
       return result;
     }
     if (Object
-      .getOwnPropertyNames(this.itemschemaDesc.keys)
+      .getOwnPropertyNames(this.itemSchemaDesc.keys)
       .includes('name')) {
       return ['name'];
     }
@@ -232,7 +232,7 @@ class ItemContainer {
 
   getFieldSchemaDesc(fieldName) {
     return utils.normaliseAlternativesSchema(
-      this.itemschemaDesc.keys[fieldName],
+      this.itemSchemaDesc.keys[fieldName],
     );
   }
 
@@ -251,7 +251,7 @@ class ItemContainer {
       if (!fkParentValue) {
         return null;
       }
-      const fkParentFieldSchema = this.itemschemaDesc.keys[parentFieldName];
+      const fkParentFieldSchema = this.itemSchemaDesc.keys[parentFieldName];
       const fkParentTargetFieldName = utils.getFkTargetFieldName(fkParentFieldSchema);
       const fkParentIdSet = {};
       fkParentIdSet[fkParentTargetFieldName] = fkParentValue;
@@ -269,12 +269,12 @@ class ItemContainer {
   }
 
   getChildFkFieldNames(fieldName) {
-    return Object.getOwnPropertyNames(this.itemschemaDesc.keys)
+    return Object.getOwnPropertyNames(this.itemSchemaDesc.keys)
       .filter((otherFieldName) => {
         if (otherFieldName === fieldName) {
           return false;
         }
-        const otherFkArg = utils.findRuleArg(this.itemschemaDesc.keys[otherFieldName], 'fk');
+        const otherFkArg = utils.findRuleArg(this.itemSchemaDesc.keys[otherFieldName], 'fk');
         return (otherFkArg && otherFkArg.options
           && (otherFkArg.options.parentFieldName === fieldName));
       });

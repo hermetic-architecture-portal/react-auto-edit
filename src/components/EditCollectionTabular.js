@@ -23,7 +23,7 @@ class EditCollectionTabular extends EditCollectionAbstract {
       if (fieldSchemaDesc.type === 'array') {
         return false;
       }
-      if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.some(m => m.image)) {
+      if (fieldSchemaDesc.metas && fieldSchemaDesc.metas.some(m => m.image)) {
         return false;
       }
     }

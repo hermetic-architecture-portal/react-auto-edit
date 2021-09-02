@@ -21,40 +21,40 @@ describe('ItemContainer', () => {
   describe('idsMatch', () => {
     it('matches identical items', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' });
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' });
       const candidate = container.item;
       expect(container.matches('makes', [], candidate)).toBeTruthy();
     });
     it('matches if iids match', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' });
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' });
       const candidate = { makeId: 'b' };
       candidate.__iid = container.item.__iid;
       expect(container.matches('makes', [], candidate)).toBeTruthy();
     });
     it('matches if iids don\'t match but ids do', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' });
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' });
       const candidate = { makeId: 'a' };
       candidate.__iid = 'blah';
       expect(container.matches('makes', [], candidate)).toBeTruthy();
     });
     it('doesn\'t match if iids and ids don\'t match', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' });
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' });
       const candidate = { makeId: 'b' };
       candidate.__iid = 'blah';
       expect(container.matches('makes', [], candidate)).toBeFalsy();
     });
     it('doesn\'t match if schema path is different', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' });
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' });
       const candidate = container.item;
       expect(container.matches('makes.[].models', [], candidate)).toBeFalsy();
     });
     it('doesn\'t match if detail level is supplied and different', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' },
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' },
         ItemContainer.detailLevel.summary);
       const candidate = container.item;
       expect(container
@@ -62,7 +62,7 @@ describe('ItemContainer', () => {
     });
     it('matches if detail level is supplied and same', () => {
       const container = new ItemContainer('makes', [],
-        schema, schema.describe().children.makes.items[0], { makeId: 'a' },
+        schema, schema.describe().keys.makes.items[0], { makeId: 'a' },
         ItemContainer.detailLevel.summary);
       const candidate = container.item;
       expect(container
@@ -71,7 +71,7 @@ describe('ItemContainer', () => {
     it('matches if parent ids and ids the same', () => {
       const container = new ItemContainer('makes.[].models', [{ makeId: 'a' }],
         schema,
-        schema.describe().children.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         { modelId: 'x' });
       const candidate = { modelId: 'x' };
       candidate.__iid = 'blah';
@@ -80,7 +80,7 @@ describe('ItemContainer', () => {
     it('fails if parent ids different and ids the same', () => {
       const container = new ItemContainer('makes.[].models', [{ makeId: 'a' }],
         schema,
-        schema.describe().children.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         { modelId: 'x' });
       const candidate = { modelId: 'x' };
       candidate.__iid = 'blah';
@@ -89,7 +89,7 @@ describe('ItemContainer', () => {
     it('matches if parent iids and iids the same', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e' }],
         schema,
-        schema.describe().children.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const candidate = {};
       candidate.__iid = container.item.__iid;
@@ -98,7 +98,7 @@ describe('ItemContainer', () => {
     it('fails if parent iids and iids different', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e' }],
         schema,
-        schema.describe().children.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const candidate = { __iid: 'f' };
       expect(container.matches('makes.[].models', [{ __iid: 'g' }], candidate)).toBeFalsy();
@@ -106,7 +106,7 @@ describe('ItemContainer', () => {
     it('fails if parent iids and iids different, and parent has undef fields', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e', makeId: undefined }],
         schema,
-        schema.describe().children.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const candidate = { __iid: 'f' };
       expect(container
@@ -122,7 +122,7 @@ describe('ItemContainer', () => {
     it('removes iids', () => {
       const container = new ItemContainer('makes.[].models', [{ __iid: 'e', makeId: 'toyota' }],
         schema,
-        schema.describe().children.makes.items[0].children.models.items[0],
+        schema.describe().keys.makes.items[0].keys.models.items[0],
         {});
       const result = container.getCleanParentIds();
       expect(result).toHaveLength(1);

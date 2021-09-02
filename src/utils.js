@@ -3,8 +3,8 @@ const isPkField = fieldSchemaDesc => fieldSchemaDesc.rules
     .some(r => r.name === 'pk');
 
 const getPrimaryKeyFieldNames = schemaDesc => Object
-  .getOwnPropertyNames(schemaDesc.children)
-  .filter(fieldName => isPkField(schemaDesc.children[fieldName]));
+  .getOwnPropertyNames(schemaDesc.keys)
+  .filter(fieldName => isPkField(schemaDesc.keys[fieldName]));
 
 const normaliseAlternativesSchema = (fieldSchemaDesc) => {
   if ((fieldSchemaDesc.type === 'alternatives') && fieldSchemaDesc.base) {
@@ -19,26 +19,27 @@ const isFkField = fieldSchemaDesc => fieldSchemaDesc.rules
 const getFkPath = fieldSchemaDesc => fieldSchemaDesc
   .rules
   .filter(r => r.name === 'fk')
-  .map(r => r.arg.path)[0];
+  .map(r => r.args.path)[0];
 
 const nextPath = chunks => chunks
   .filter((item, index) => index > 0)
   .join('.');
 
 const reach = (schema, path) => {
-  // have to access Joi internals to traverse the object tree
-  // as built in Joi.reach does not traverse arrays
+  // the underscore Joi methods are now documented
+  // so I assume fine to use them
+  // built in Joi.reach does not traverse arrays
   const chunks = path.split('.').filter(chunk => !!chunk);
   if (!chunks.length) {
     return schema;
   }
   const currentChunk = chunks[0];
   if (currentChunk === '[]') {
-    if (schema._inner.items && schema._inner.items.length) {
-      return reach(schema._inner.items[0], nextPath(chunks));
+    if (schema.$_terms.items && schema.$_terms.items.length) {
+      return reach(schema.$_terms.items[0], nextPath(chunks));
     }
-  } else if (schema._inner.children) {
-    const childSchema = schema._inner.children.find(c => c.key === currentChunk);
+  } else if (schema.$_terms.keys) {
+    const childSchema = schema.$_terms.keys.find(c => c.key === currentChunk);
     if (childSchema) {
       return reach(childSchema.schema, nextPath(chunks));
     }
@@ -66,7 +67,7 @@ const findRuleArg = (schemaDesc, ruleName) => {
   if (!rule) {
     return undefined;
   }
-  return rule.arg;
+  return rule.args;
 };
 
 const getFieldDisplayName = (fieldName, fieldSchemaDesc) => {
@@ -98,30 +99,30 @@ const isRequiredField = fieldSchemaDesc => fieldSchemaDesc.flags
 
 const getDisplayNameFieldNames = (schemaDesc) => {
   const result = Object
-    .getOwnPropertyNames(schemaDesc.children)
-    .filter(fieldName => schemaDesc.children[fieldName].meta
-      && schemaDesc.children[fieldName].meta
+    .getOwnPropertyNames(schemaDesc.keys)
+    .filter(fieldName => schemaDesc.keys[fieldName].metas
+      && schemaDesc.keys[fieldName].metas
         .some(meta => meta.displayName));
   if (result.length) {
     return result;
   }
   if (Object
-    .getOwnPropertyNames(schemaDesc.children)
+    .getOwnPropertyNames(schemaDesc.keys)
     .includes('name')) {
     return ['name'];
   }
   return getPrimaryKeyFieldNames(schemaDesc);
 };
 
-const isGeneratedField = fieldSchemaDesc => fieldSchemaDesc.meta
-  && fieldSchemaDesc.meta.some(m => m.generated);
+const isGeneratedField = fieldSchemaDesc => fieldSchemaDesc.metas
+  && fieldSchemaDesc.metas.some(m => m.generated);
 
 const hasGeneratedField = itemSchemaDesc => Object
-  .getOwnPropertyNames(itemSchemaDesc.children)
-  .some(fieldName => isGeneratedField(itemSchemaDesc.children[fieldName]));
+  .getOwnPropertyNames(itemSchemaDesc.keys)
+  .some(fieldName => isGeneratedField(itemSchemaDesc.keys[fieldName]));
 
-const isHiddenField = fieldSchemaDesc => fieldSchemaDesc.meta
-  && fieldSchemaDesc.meta.some(m => m.hidden);
+const isHiddenField = fieldSchemaDesc => fieldSchemaDesc.metas
+  && fieldSchemaDesc.metas.some(m => m.hidden);
 
 const hasSuggestedValues = fieldSchemaDesc => fieldSchemaDesc.valids
  && fieldSchemaDesc.valids.length;

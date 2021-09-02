@@ -96,5 +96,4 @@ class EditCollection extends EditCollectionAbstract {
   }
 }
 
-
 export default observer(EditCollection);

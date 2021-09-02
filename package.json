@@ -1,53 +1,53 @@
 {
   "name": "react-auto-edit",
-  "version": "2.3.5",
+  "version": "3.0.1",
   "description": "",
   "main": "lib/index.js",
   "types": "types",
   "scripts": {
     "test": "jest",
-    "build": "babel src -d lib && tsc",
+    "build": "eslint src && babel src -d lib && tsc",
     "watch": "nodemon --ignore lib --exec \"babel src -d lib\""
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
-    "@babel/preset-react": "^7.0.0",
-    "enzyme": "^3.10.0",
-    "enzyme-adapter-react-16": "^1.14.0",
-    "eslint": "^5.15.1",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-jest": "^22.3.2",
-    "eslint-plugin-react": "^7.13.0",
-    "jest": "^24.8.0",
-    "joi": "^14.3.1",
-    "joi-key-extensions": "^1.0.10",
-    "nodemon": "^1.19.1",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-react": "^7.14.5",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.6",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jest": "^24.4.0",
+    "eslint-plugin-react": "^7.25.1",
+    "jest": "^27.1.0",
+    "joi": "^17.4.2",
+    "joi-key-extensions": "^2.0.2",
+    "nodemon": "^2.0.12",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-router-dom": "^4.3.1",
-    "react-test-renderer": "^16.10.1",
+    "react-test-renderer": "^17.0.2",
     "typescript-temporary-fork-for-jsdoc": "^3.6.0-insiders.20190802"
   },
   "dependencies": {
     "base64-arraybuffer": "^0.2.0",
-    "chokidar": "^3.3.1",
+    "chokidar": "^3.5.2",
     "clone-deep": "^4.0.1",
-    "dayjs": "^1.8.16",
+    "dayjs": "^1.10.6",
     "install": "^0.13.0",
-    "mobx": "^5.9.0",
-    "mobx-react": "^5.4.3",
-    "npm": "^6.11.3",
+    "mobx": "^6.3.3",
+    "mobx-react": "^7.2.0",
+    "npm": "^7.21.1",
     "p-limit": "^2.2.0",
-    "react-aria-menubutton": "^6.1.0",
+    "react-aria-menubutton": "^7.0.3",
     "react-hotkeys": "^2.0.0",
-    "react-select": "^3.0.4",
-    "react-tooltip": "^3.10.0",
-    "uuid": "^3.3.2"
+    "react-select": "^4.3.1",
+    "react-tooltip": "^4.2.21",
+    "uuid": "^8.3.2"
   },
   "peerDependencies": {
     "react-router-dom": "*"
@@ -63,5 +63,8 @@
   },
   "bugs": {
     "url": "https://github.com/hermetic-architecture-portal/react-auto-edit/issues"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
   }
 }

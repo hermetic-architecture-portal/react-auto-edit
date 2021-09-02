@@ -20,7 +20,7 @@ const EditField = ({
   const min = utils.findRuleArg(fieldSchemaDesc, 'min');
   const options = {
     controller,
-    collectionSchemaPath: container.metadata.collectionSchemaPath, 
+    collectionSchemaPath: container.metadata.collectionSchemaPath,
     fieldName,
     container,
     fieldType: fieldSchemaDesc.type,

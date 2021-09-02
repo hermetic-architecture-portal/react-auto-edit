@@ -153,7 +153,7 @@ class ItemStore {
       }
     } else {
       const nextPath = pathChunks.filter((x, index) => index > 0).join('.');
-      const nextSchemaDesc = schemaDesc.children[currentChunk];
+      const nextSchemaDesc = schemaDesc.keys[currentChunk];
       if (nextSchemaDesc.type === 'array') {
         // eslint-disable-next-line no-param-reassign
         data[currentChunk] = data[currentChunk] || [];

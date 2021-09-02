@@ -17,13 +17,13 @@ class EditCollectionTabular extends EditCollectionAbstract {
   static canShowCollection(schema, collectionSchemaPath) {
     const itemSchemaDesc = utils.reach(schema, `${collectionSchemaPath}.[]`)
       .describe();
-    const fieldNames = Object.getOwnPropertyNames(itemSchemaDesc.children);
+    const fieldNames = Object.getOwnPropertyNames(itemSchemaDesc.keys);
     for (let i = 0; i < fieldNames.length; i += 1) {
-      const fieldSchemaDesc = itemSchemaDesc.children[fieldNames[i]];
+      const fieldSchemaDesc = itemSchemaDesc.keys[fieldNames[i]];
       if (fieldSchemaDesc.type === 'array') {
         return false;
       }
-      if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.some(m => m.image)) {
+      if (fieldSchemaDesc.metas && fieldSchemaDesc.metas.some(m => m.image)) {
         return false;
       }
     }
@@ -35,7 +35,7 @@ class EditCollectionTabular extends EditCollectionAbstract {
     const searchResult = this.getSearchResult();
     const itemSchemaDesc = this.getItemSchemaDesc();
     const headings = !searchResult.containers.length ? undefined
-      : Object.getOwnPropertyNames(itemSchemaDesc.children)
+      : Object.getOwnPropertyNames(itemSchemaDesc.keys)
         .map((fieldName, index, array) => {
           const fieldSchemaDesc = utils.reach(controller.schema, `${schemaPath}.[].${fieldName}`)
             .describe();
@@ -88,6 +88,5 @@ class EditCollectionTabular extends EditCollectionAbstract {
     </div>;
   }
 }
-
 
 export default observer(EditCollectionTabular);

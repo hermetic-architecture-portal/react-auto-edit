@@ -24,13 +24,13 @@ const Menu = ({
   const schemaDesc = controller.schema.describe();
   let items;
   let currentFieldDisplayName;
-  if (schemaDesc.children) {
-    const currentFieldName = Object.getOwnPropertyNames(schemaDesc.children)
+  if (schemaDesc.keys) {
+    const currentFieldName = Object.getOwnPropertyNames(schemaDesc.keys)
       .find(fieldName => location.pathname.startsWith(`${controller.baseClientPath}/${fieldName}`));
     currentFieldDisplayName = currentFieldName && utils.getFieldDisplayName(
       currentFieldName, utils.reach(controller.schema, currentFieldName).describe(),
     );
-    items = Object.getOwnPropertyNames(schemaDesc.children)
+    items = Object.getOwnPropertyNames(schemaDesc.keys)
       .sort((a, b) => a.localeCompare(b))
       .map((fieldName) => {
         const className = (currentFieldName === fieldName)

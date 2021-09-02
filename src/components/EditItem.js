@@ -32,7 +32,7 @@ class EditItem extends React.Component {
     if (!container) {
       return <div></div>;
     }
-    const fields = Object.getOwnPropertyNames(container.itemSchemaDesc.children)
+    const fields = Object.getOwnPropertyNames(container.itemSchemaDesc.keys)
       .map(fieldName => <EditFieldGroup
         key={`${fieldName}-${container.getKey()}`}
         container={container}

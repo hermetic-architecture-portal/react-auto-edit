@@ -7,6 +7,7 @@ import constants from './constants';
 class ItemStore {
   constructor(schema) {
     this.schema = schema;
+    this.masterSchemaDesc = schema.describe();
     this.containers = observable([]);
     this.schemaDescriptions = observable.map({});
     this.toObject = this.toObject.bind(this);
@@ -188,7 +189,7 @@ class ItemStore {
     this.containers.forEach((container) => {
       ItemStore._pokeItemIntoPath(
         container.item, container.getIds(),
-        container.metadata.collectionSchemaPath, this.schema.describe(),
+        container.metadata.collectionSchemaPath, this.masterSchemaDesc,
         container.metadata.parentIds, result,
       );
     });

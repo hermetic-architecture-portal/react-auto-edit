@@ -1,13 +1,14 @@
 {
   "name": "react-auto-edit",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "",
   "main": "lib/index.js",
   "types": "types",
   "scripts": {
     "test": "jest",
     "build": "eslint src && babel src -d lib && tsc",
-    "watch": "nodemon --ignore lib --exec \"babel src -d lib\""
+    "watch": "nodemon --ignore lib --exec \"babel src -d lib\"",
+    "test-debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "author": "",
   "license": "MIT",

@@ -124,13 +124,13 @@ const hasGeneratedField = itemSchemaDesc => Object
 const isHiddenField = fieldSchemaDesc => fieldSchemaDesc.metas
   && fieldSchemaDesc.metas.some(m => m.hidden);
 
-const hasSuggestedValues = fieldSchemaDesc => fieldSchemaDesc.valids
- && fieldSchemaDesc.valids.length;
+const hasSuggestedValues = fieldSchemaDesc => fieldSchemaDesc.allow
+ && fieldSchemaDesc.allow.length;
 
-const getSuggestedValues = fieldSchemaDesc => fieldSchemaDesc.valids;
+const getSuggestedValues = fieldSchemaDesc => fieldSchemaDesc.allow;
 
 const suggestedValuesOnly = fieldSchemaDesc => fieldSchemaDesc.flags
-  && fieldSchemaDesc.flags.allowOnly;
+  && fieldSchemaDesc.flags.only;
 
 export default {
   reach,

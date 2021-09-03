@@ -189,7 +189,7 @@ class ItemStore {
     this.containers.forEach((container) => {
       ItemStore._pokeItemIntoPath(
         container.item, container.getIds(),
-        container.metadata.collectionSchemaPath, this.schema.describe(),
+        container.metadata.collectionSchemaPath, this.masterSchemaDesc,
         container.metadata.parentIds, result,
       );
     });

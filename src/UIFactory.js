@@ -133,7 +133,7 @@ class UIFactory {
         maxLength={max}
         minLength={min} />;
     }
-    if (fieldSchemaDesc.meta && fieldSchemaDesc.meta.find(m => m.image)) {
+    if (fieldSchemaDesc.metas && fieldSchemaDesc.metas.find(m => m.image)) {
       return <EditFieldImage readonly={readonly}
         fieldName={fieldName} required={isRequired}
         container={container} controller={controller} />;

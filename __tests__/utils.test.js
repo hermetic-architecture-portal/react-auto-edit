@@ -55,4 +55,24 @@ describe('utils', () => {
       expect(utils.getFkPath(testSchema.describe())).toBe('this.that');
     });
   });
+  describe('getSuggestedValues', () => {
+    it('gets suggested values for valid', () => {
+      const testSchema = Joi.string().valid('Yes', 'No');
+      expect(utils.getSuggestedValues(testSchema.describe())).toMatchObject(['Yes', 'No']);
+    });
+    it('gets suggested values for allow', () => {
+      const testSchema = Joi.string().allow('Yes', 'No');
+      expect(utils.getSuggestedValues(testSchema.describe())).toMatchObject(['Yes', 'No']);
+    });
+  });
+  describe('suggestedValuesOnly', () => {
+    it('returns true for valid', () => {
+      const testSchema = Joi.string().valid('Yes', 'No');
+      expect(utils.suggestedValuesOnly(testSchema.describe())).toBeTruthy();
+    });
+    it('returns false for allow', () => {
+      const testSchema = Joi.string().allow('Yes', 'No');
+      expect(utils.suggestedValuesOnly(testSchema.describe())).toBeFalsy();
+    });
+  });
 });

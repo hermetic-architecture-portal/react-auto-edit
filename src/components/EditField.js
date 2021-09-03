@@ -16,8 +16,10 @@ const EditField = ({
   const readonly = (utils.isPkField(fieldSchemaDesc) && !container.isNewItem())
     || utils.isGeneratedField(fieldSchemaDesc);
   const isRequired = utils.isRequiredField(fieldSchemaDesc);
-  const max = utils.findRuleArg(fieldSchemaDesc, 'max');
-  const min = utils.findRuleArg(fieldSchemaDesc, 'min');
+  const maxRule = utils.findRuleArg(fieldSchemaDesc, 'max');
+  const max = maxRule ? maxRule.limit : undefined;
+  const minRule = utils.findRuleArg(fieldSchemaDesc, 'min');
+  const min = minRule ? minRule.limit : undefined;
   const options = {
     controller,
     collectionSchemaPath: container.metadata.collectionSchemaPath,

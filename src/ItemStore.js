@@ -7,6 +7,7 @@ import constants from './constants';
 class ItemStore {
   constructor(schema) {
     this.schema = schema;
+    this.masterSchemaDesc = schema.describe();
     this.containers = observable([]);
     this.schemaDescriptions = observable.map({});
     this.toObject = this.toObject.bind(this);

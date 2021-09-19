@@ -1,6 +1,6 @@
 {
   "name": "customisation-example",
-  "version": "2.3.5",
+  "version": "3.0.1",
   "private": true,
   "dependencies": {
     "craco": "0.0.3",

@@ -71,8 +71,8 @@ const findRuleArg = (schemaDesc, ruleName) => {
 };
 
 const getFieldDisplayName = (fieldName, fieldSchemaDesc) => {
-  if (fieldSchemaDesc.label) {
-    return fieldSchemaDesc.label;
+  if (fieldSchemaDesc.flags && fieldSchemaDesc.flags.label) {
+    return fieldSchemaDesc.flags.label;
   }
   return fieldName
     // insert a space before all caps

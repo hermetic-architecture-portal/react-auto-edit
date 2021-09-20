@@ -65,6 +65,16 @@ describe('utils', () => {
       expect(utils.getSuggestedValues(testSchema.describe())).toMatchObject(['Yes', 'No']);
     });
   });
+  describe('getFieldDisplayName', () => {
+    it('returns display name', () => {
+      const testSchema = Joi.any();
+      expect(utils.getFieldDisplayName('testSchema', testSchema.describe())).toEqual('Test Schema');
+    });
+    it('returns custom display name', () => {
+      const testSchema = Joi.any().label('Custom Name');
+      expect(utils.getFieldDisplayName('testSchema', testSchema.describe())).toEqual('Custom Name');
+    });
+  });
   describe('suggestedValuesOnly', () => {
     it('returns true for valid', () => {
       const testSchema = Joi.string().valid('Yes', 'No');

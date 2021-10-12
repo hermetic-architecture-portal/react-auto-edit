@@ -2,6 +2,15 @@ import { observable } from 'mobx';
 import pLimit from 'p-limit';
 import utils from './utils';
 
+class HttpResponseError extends Error {
+  constructor(message, status, url, body) {
+    super(message);
+    this.status = status;
+    this.body = body;
+    this.url = url;
+  }
+}
+
 /**
  * @typedef {Object} Options
  * @property {number} concurrentFetchesLimit - Limits how many concurrent API calls can be made by the client
@@ -63,10 +72,13 @@ class ApiProxy {
         const body = await response.text();
         const error = `${response.status} - ${response.statusText}: ${body}`;
         console.error(`Error fetching ${url}`, error);
-        throw new Error(error);
+        throw new HttpResponseError(error, response.status, url, body);
       }
       return response.json();
     } catch (error) {
+      if (error instanceof HttpResponseError) {
+        throw error;
+      }
       throw Error(`Error fetching ${url}: ${error.message}`);
     } finally {
       this.removeInFlightItem(url, options);

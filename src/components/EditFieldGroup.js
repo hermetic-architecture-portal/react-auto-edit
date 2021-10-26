@@ -17,9 +17,9 @@ const EditFieldGroup = ({
 }) => {
   const fieldSchemaDesc = container.getFieldSchemaDesc(fieldName);
   let description;
-  if (fieldSchemaDesc.description) {
+  if (fieldSchemaDesc.flags && fieldSchemaDesc.flags.description) {
     description = <div className="Ed-field-info"
-      data-tip={fieldSchemaDesc.description}></div>;
+      data-tip={fieldSchemaDesc.flags.description}></div>;
   }
   let required;
   if (utils.isRequiredField(fieldSchemaDesc)) {
